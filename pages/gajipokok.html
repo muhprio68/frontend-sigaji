@@ -1,0 +1,570 @@
+<style>
+    .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
+    .border-left-success { border-left: 0.25rem solid #1cc88a !important; }
+    .border-left-danger { border-left: 0.25rem solid #e74a3b !important; }
+    .border-left-info { border-left: 0.25rem solid #36b9cc !important; }
+
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+        body {
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important;
+            font-size: 12px !important;
+        }
+        body * {
+            visibility: hidden;
+        }
+        #modalDetailGaji {
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #modalDetailGaji .modal-dialog {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #modalDetailGaji .modal-content {
+            border: none;
+            box-shadow: none !important;
+            width: 100%;
+        }
+        #modalDetailGaji .modal-content * {
+            visibility: visible;
+        }
+        
+        .modal-header, .modal-footer, .close {
+            display: none !important; 
+        }
+
+        #modalDetailGaji .modal-body {
+            padding: 0.5rem !important; 
+        }
+        #modalDetailGaji .d-flex.mb-2 {
+            margin-bottom: 0.15rem !important;
+            font-size: 11.5px !important;
+        }
+        #modalDetailGaji .card-body {
+            padding: 0.5rem 1rem !important;
+        }
+        #modalDetailGaji h4 { font-size: 15px !important; margin-bottom: 2px !important; }
+        #modalDetailGaji h5 { font-size: 13px !important; }
+        #modalDetailGaji h6 { font-size: 12px !important; margin-bottom: 2px !important; }
+        #modalDetailGaji h3 { font-size: 16px !important; margin-bottom: 0 !important; }
+        #modalDetailGaji .mb-4 { margin-bottom: 1rem !important; }
+        #modalDetailGaji .mt-4 { margin-top: 1rem !important; }
+        #modalDetailGaji .mt-5 { margin-top: 1.5rem !important; }
+        #modalDetailGaji .pt-4 { padding-top: 0.5rem !important; }
+        #modalDetailGaji hr { margin: 0.5rem 0 !important; border-top: 1px solid #000 !important; }
+        
+        .bg-primary { background-color: #4e73df !important; color: white !important; }
+        .bg-success { background-color: #1cc88a !important; color: white !important; }
+        .bg-light { background-color: #f8f9fc !important; }
+        .shadow, .shadow-sm, .shadow-lg { box-shadow: none !important; }
+        
+        .print-signature {
+            page-break-inside: avoid;
+            margin-top: 30px !important;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h3 class="card-title font-weight-bold mb-0">Data Gaji Pegawai</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="font-weight-bold">Jenis</label>
+                <select id="filterTipe" class="form-control">
+                <option value="bulanan">Bulanan</option>
+                <option value="thr">THR</option>
+                <option value="gaji_13">Gaji 13</option>
+                </select>
+            </div>
+
+            <div class="col-md-3" id="bulanField">
+                <label class="font-weight-bold">Bulan</label>
+                <select id="filterBulan" class="form-control">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7">Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="font-weight-bold">Tahun</label>
+                <select id="filterTahun" class="form-control"></select>
+            </div>
+            </div>
+
+            <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pegawai</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPegawai">0 Orang</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Gaji Bruto</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumBruto">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Potongan</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPotongan">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Gaji Bersih</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumBersih">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover" id="tableGaji">
+                <thead class="text-center bg-light">
+                <tr>
+                    <th width="50">No</th>
+                    <th>NIP</th>
+                    <th class="text-left">Nama</th>
+                    <th width="150">Gaji Kotor</th>
+                    <th width="150">Total Potongan</th>
+                    <th width="150">Gaji Bersih</th>
+                    <th width="80">Aksi</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            </div>
+
+            <nav>
+            <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetailGaji" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title font-weight-bold"><i class="fas fa-file-invoice-dollar mr-2"></i> Slip Rincian Gaji</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+            <span>&times;</span>
+        </button>
+        </div>
+
+        <div class="modal-body p-4">
+        
+        <div class="text-center mb-4 d-none d-print-block">
+            <h4 class="font-weight-bold text-uppercase mb-1">SLIP PEMBAYARAN GAJI PEGAWAI</h4>
+            <p class="mb-0 text-muted">Berdasarkan Peraturan yang Berlaku</p>
+            <hr>
+        </div>
+
+        <div class="card bg-light border-0 mb-4 shadow-sm">
+            <div class="card-body py-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted small">Nama Pegawai</p>
+                        <h6 class="font-weight-bold mb-2" id="gaji_dNama">-</h6>
+                        <p class="mb-0 text-muted small">NIP</p>
+                        <h6 class="font-weight-bold mb-0" id="gaji_dNip">-</h6>
+                    </div>
+                    <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                        <p class="mb-0 text-muted small">Periode Pembayaran</p>
+                        <h5 class="font-weight-bold text-primary mb-0 mt-1" id="gaji_dPeriode">-</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h6 class="font-weight-bold text-success border-bottom pb-2 mb-3"><i class="fas fa-plus-circle mr-1"></i> PENERIMAAN</h6>
+                
+                <div class="d-flex justify-content-between mb-2 small"><span>Gaji Pokok</span> <span id="gaji_dGajiPokok" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Suami/Istri</span> <span id="gaji_dTunjSI" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Anak</span> <span id="gaji_dTunjAnak" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Jabatan</span> <span id="gaji_dTunjJabatan" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Fungsional</span> <span id="gaji_dTunjFungsional" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Fungsional Umum</span> <span id="gaji_dTunjFungsionalUmum" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. Beras</span> <span id="gaji_dTunjBeras" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Tunj. PPh</span> <span id="gaji_dTunjPph" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Pembulatan</span> <span id="gaji_dPembulatan" class="font-weight-bold"></span></div>
+                
+                <div class="mt-3 mb-2 text-muted small font-italic">Jaminan Dibayar Pemerintah (Penambah):</div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>BPJS Kesehatan (4%)</span> <span id="gaji_dBpjsPemda"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Jaminan Kecelakaan Kerja (JKK)</span> <span id="gaji_dJkkPemda"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Jaminan Kematian (JKM)</span> <span id="gaji_dJkmPemda"></span></div>
+
+                <div class="d-flex justify-content-between mt-4 pt-2 border-top border-success font-weight-bold text-success" style="font-size: 1.1em;">
+                    <span>TOTAL BRUTO</span> <span id="gaji_dBruto"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h6 class="font-weight-bold text-danger border-bottom pb-2 mb-3"><i class="fas fa-minus-circle mr-1"></i> POTONGAN</h6>
+                
+                <div class="d-flex justify-content-between mb-2 small"><span>IWP 8% (Pensiun & JHT)</span> <span id="gaji_dIwp8" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>IWP 1% (BPJS Kes Pegawai)</span> <span id="gaji_dIwp1" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Iuran Tapera</span> <span id="gaji_dTapera" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Potongan Lainnya</span> <span id="gaji_dPotLain" class="font-weight-bold"></span></div>
+                
+                <div class="mt-3 mb-2 text-muted small font-italic">Potongan In-Out (Sesuai Jaminan):</div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Pot. BPJS Kes (4%)</span> <span id="gaji_dPotBpjsPemda"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Pot. JKK</span> <span id="gaji_dPotJkkPemda"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Pot. JKM</span> <span id="gaji_dPotJkmPemda"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Pot. Tunjangan PPh</span> <span id="gaji_dPotTunjPph"></span></div>
+                
+                <div class="d-flex justify-content-between mt-4 pt-2 border-top border-danger font-weight-bold text-danger" style="font-size: 1.1em;">
+                    <span>TOTAL POTONGAN</span> <span id="gaji_dTotalPotongan"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-success text-white mt-4 border-0 shadow">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3">
+                <h5 class="mb-2 mb-md-0 font-weight-bold text-uppercase">Gaji Bersih (Take Home Pay)</h5>
+                <h3 class="mb-0 font-weight-bold" id="gaji_dBersih">Rp 0</h3>
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-4 print-signature d-none d-print-flex">
+            <div class="col-7">
+                <p class="text-muted small font-italic mb-0">Catatan:</p>
+                <p class="text-muted small font-italic" style="font-size: 10px;">Pajak PPh Pasal 21 dan Jaminan Kesehatan telah dipotong sesuai dengan peraturan yang berlaku.</p>
+            </div>
+            <div class="col-5 text-center">
+                <p class="mb-1">................................., ...........................</p>
+                <p class="mb-4">Bendahara Pengeluaran,</p>
+                <br><br><br>
+                <h6 class="font-weight-bold mb-0 text-decoration-underline">......................................................</h6>
+                <p class="mb-0">NIP. ..............................................</p>
+            </div>
+        </div>
+
+        </div>
+        <div class="modal-footer bg-light border-0 d-print-none">
+            <button type="button" class="btn btn-secondary shadow-sm font-weight-bold" data-dismiss="modal">Tutup</button>
+            <button type="button" class="btn btn-primary shadow-sm font-weight-bold" onclick="window.print()">
+                <i class="fas fa-print mr-1"></i> Cetak Dokumen
+            </button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+// BUNGKUSAN SAKTI BIAR VARIABEL GAK TABRAKAN DI SPA
+(function () {
+    let allData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    const bulanSelect = document.getElementById("filterBulan");
+    const tahunSelect = document.getElementById("filterTahun");
+    const tipeSelect = document.getElementById("filterTipe");
+    const bulanField = document.getElementById("bulanField");
+    const tbody = document.querySelector("#tableGaji tbody");
+    
+    // Nangkep parameter ?jenis=pns dari URL
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+    const jenisParam = params.get("jenis");
+
+    const statusMap = { pns: 1, pppk: 2 };
+    const jenis = statusMap[jenisParam?.toLowerCase()] || 0;
+
+    if(!tahunSelect) return;
+
+    const currentYear = new Date().getFullYear();
+    bulanSelect.value = 1; 
+
+    for (let y = currentYear - 5; y <= currentYear; y++) {
+        let option = document.createElement("option");
+        option.value = y;
+        option.text = y;
+        if (y === currentYear) option.selected = true;
+        tahunSelect.appendChild(option);
+    }
+
+    bulanSelect.addEventListener("change", loadData);
+    tahunSelect.addEventListener("change", loadData);
+    tipeSelect.addEventListener("change", function () {
+        toggleBulan();
+        loadData();
+    });
+
+    function formatRupiah(angka) {
+        return "Rp " + (angka || 0).toLocaleString("id-ID");
+    }
+
+    function toggleBulan() {
+        const tipe = tipeSelect.value;
+        if (tipe === "thr" || tipe === "gaji_13") {
+            bulanField.style.display = "none";
+        } else {
+            bulanField.style.display = "block";
+        }
+    }
+
+    function updateSummaryCards() {
+        let sumPegawai = allData.length;
+        let sumBruto = 0;
+        let sumPotongan = 0;
+        let sumBersih = 0;
+
+        allData.forEach(item => {
+            sumBruto += item.bruto_gaji || 0;
+            sumPotongan += item.potongan_gaji || 0;
+            sumBersih += item.gaji_bersih || 0;
+        });
+
+        document.getElementById("sumPegawai").innerText = sumPegawai + " Orang";
+        document.getElementById("sumBruto").innerText = formatRupiah(sumBruto);
+        document.getElementById("sumPotongan").innerText = formatRupiah(sumPotongan);
+        document.getElementById("sumBersih").innerText = formatRupiah(sumBersih);
+    }
+
+    function loadData() {
+        let bulan = bulanSelect.value;
+        let tahun = tahunSelect.value;
+        let tipe = tipeSelect.value;
+
+        // Bikin URL
+        let url = `${API_BASE_URL}/gajipokok?tahun=${tahun}`;
+        if (jenis !== 0) url += `&jenis=${jenis}`;
+        if (tipe === "" || tipe === "bulanan") url += `&bulan=${bulan}`;
+        if (tipe !== "") url += `&tipe=${tipe}`;
+
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
+
+        // Fetch pake JWT Karcis Satpam
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then((res) => {
+            if (!res.ok) {
+                if(res.status === 401) Auth.logout();
+                throw new Error("Gagal load API");
+            }
+            return res.json();
+        })
+        .then((res) => {
+            allData = Array.isArray(res) ? res : res.data || [];
+            updateSummaryCards();
+            currentPage = 1;
+            displayTable();
+            setupPagination();
+        })
+        .catch((error) => {
+            console.error("Gagal fetch data:", error);
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data</td></tr>`;
+            allData = [];
+            updateSummaryCards();
+        });
+    }
+
+    function displayTable() {
+        tbody.innerHTML = "";
+
+        if (allData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada data gaji pada periode ini</td></tr>`;
+            return;
+        }
+
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+        let paginatedItems = allData.slice(start, end);
+
+        paginatedItems.forEach((item, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="text-center align-middle">${start + index + 1}</td>
+                    <td class="align-middle">${item.nip}</td>
+                    <td class="align-middle text-left">${item.nama}</td>
+                    <td class="align-middle text-right">${formatRupiah(item.bruto_gaji)}</td>
+                    <td class="align-middle text-right text-danger">${formatRupiah(item.potongan_gaji)}</td>
+                    <td class="align-middle text-right font-weight-bold text-success">${formatRupiah(item.gaji_bersih)}</td>
+                    <td class="text-center align-middle">
+                        <button onclick="showGaji(${item.id})" class="btn btn-info btn-sm shadow-sm" title="Lihat Rincian">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function setupPagination() {
+        let pageCount = Math.ceil(allData.length / rowsPerPage);
+        let pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        if (pageCount <= 1) return; 
+
+        for (let i = 1; i <= pageCount; i++) {
+            pagination.innerHTML += `
+                <li class="page-item ${i === currentPage ? "active" : ""}">
+                    <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${i})">${i}</a>
+                </li>
+            `;
+        }
+    }
+
+    window.changePage = function (page) {
+        currentPage = page;
+        displayTable();
+        setupPagination();
+    };
+
+   window.showGaji = function (id) {
+        fetch(`${API_BASE_URL}/gajipokok/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then((res) => {
+            if (!res.ok) {
+                if(res.status === 401) Auth.logout();
+                throw new Error("Gagal load Detail");
+            }
+            return res.json();
+        })
+        .then((resData) => {
+            const item = resData.data ? resData.data : resData;
+
+            // NIP & Nama
+            const nip = item.nip || (item.Pegawai ? item.Pegawai.nip : "-");
+            const nama = item.nama || (item.Pegawai ? item.Pegawai.nama : "-");
+            document.getElementById("gaji_dNip").innerText = nip;
+            document.getElementById("gaji_dNama").innerText = nama;
+            
+            // Periode
+            let strTipe = (item.jenis_penghasilan || "Bulanan").toUpperCase();
+            let namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const bulanIdx = parseInt(item.bulan) || 0;
+            const namaBulanStr = bulanIdx > 0 && bulanIdx <= 12 ? namaBulan[bulanIdx] : "";
+            const tahunStr = item.tahun || "";
+            document.getElementById("gaji_dPeriode").innerText = "GAJI " + strTipe + " " + namaBulanStr + " " + tahunStr;
+
+            // Rincian Penerimaan
+            document.getElementById("gaji_dGajiPokok").innerText = formatRupiah(item.gaji_pokok || 0);
+            document.getElementById("gaji_dTunjSI").innerText = formatRupiah(item.tunj_suami_istri || 0);
+            document.getElementById("gaji_dTunjAnak").innerText = formatRupiah(item.tunj_anak || 0);
+            document.getElementById("gaji_dTunjJabatan").innerText = formatRupiah(item.tunj_jabatan || 0);
+            document.getElementById("gaji_dTunjFungsional").innerText = formatRupiah(item.tunj_fungsional || 0);
+            document.getElementById("gaji_dTunjFungsionalUmum").innerText = formatRupiah(item.tunj_fungsional_umum || 0);
+            document.getElementById("gaji_dTunjBeras").innerText = formatRupiah(item.tunj_beras || 0);
+            document.getElementById("gaji_dTunjPph").innerText = formatRupiah(item.tunj_pph || 0);
+            document.getElementById("gaji_dPembulatan").innerText = formatRupiah(item.pembulatan || 0);
+            document.getElementById("gaji_dBpjsPemda").innerText = formatRupiah(item.bpjs_kes_pemda || 0);
+            document.getElementById("gaji_dJkkPemda").innerText = formatRupiah(item.jkk_pemda || 0);
+            document.getElementById("gaji_dJkmPemda").innerText = formatRupiah(item.jkm_pemda || 0);
+            document.getElementById("gaji_dBruto").innerText = formatRupiah(item.bruto_gaji || 0);
+
+            // Rincian Potongan
+            document.getElementById("gaji_dIwp8").innerText = formatRupiah(item.iwp_8_persen || 0);
+            document.getElementById("gaji_dIwp1").innerText = formatRupiah(item.iwp_1_persen || 0);
+            document.getElementById("gaji_dTapera").innerText = formatRupiah(item.potongan_tapera || 0);
+            document.getElementById("gaji_dPotLain").innerText = formatRupiah(item.potongan_lain || 0);
+            document.getElementById("gaji_dPotTunjPph").innerText = formatRupiah(item.tunj_pph || 0); 
+            document.getElementById("gaji_dPotBpjsPemda").innerText = formatRupiah(item.bpjs_kes_pemda || 0);
+            document.getElementById("gaji_dPotJkkPemda").innerText = formatRupiah(item.jkk_pemda || 0);
+            document.getElementById("gaji_dPotJkmPemda").innerText = formatRupiah(item.jkm_pemda || 0);
+            
+            // Hitung Total Potongan & Bersih
+            let hitungPotongan = (parseFloat(item.iwp_8_persen) || 0) + (parseFloat(item.iwp_1_persen) || 0) + 
+                                 (parseFloat(item.potongan_tapera) || 0) + (parseFloat(item.potongan_lain) || 0) + 
+                                 (parseFloat(item.tunj_pph) || 0) + (parseFloat(item.bpjs_kes_pemda) || 0) + 
+                                 (parseFloat(item.jkk_pemda) || 0) + (parseFloat(item.jkm_pemda) || 0);
+                                 
+            let totalPot = item.total_potongan !== undefined ? item.total_potongan : hitungPotongan;
+
+            document.getElementById("gaji_dTotalPotongan").innerText = formatRupiah(totalPot || 0);
+            document.getElementById("gaji_dBersih").innerText = formatRupiah(item.gaji_bersih || 0);
+
+            $("#modalDetailGaji").modal("show");
+        })
+        .catch((err) => {
+            console.error("Gagal ambil detail:", err);
+            alert("Gagal mengambil rincian detail slip gaji. Pastikan token masih aktif.");
+        });
+    };
+
+    // Init awal
+    toggleBulan();
+    loadData();
+})();
+</script>

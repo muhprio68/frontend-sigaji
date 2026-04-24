@@ -1,0 +1,119 @@
+<aside class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#" onclick="loadPage('pages/dashboard.html')">
+        <div class="sidebar-brand-icon">
+            <img src="assets/img/logo-bjn.svg" alt="Logo Pemkab Bojonegoro" width="35" height="45" style="transition: all 0.2s; object-fit: contain;">
+        </div>
+        <div class="sidebar-brand-text mx-3" style="letter-spacing: 1px; text-align: left; line-height: 1.2; font-size: 0.9rem;">
+            SIGAJI DINPORA<br>
+            <span class="text-warning" style="font-size: 0.7rem;">KAB. BOJONEGORO</span>
+        </div>
+    </a>
+
+    <hr class="sidebar-divider my-0 mt-2">
+
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadPage('pages/dashboard.html')">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Master Data</div>
+    
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePegawai">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Data Pegawai</span>
+        </a>
+        <div id="collapsePegawai" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pegawai.html?jenis=pns')">PNS</a>
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pegawai.html?jenis=pppk')">PPPK</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Import Data</div>
+    
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadPage('pages/importgaji.html')">
+            <i class="fas fa-fw fa-file-import"></i>
+            <span>Import Gaji</span>
+        </a>
+    </li>
+    
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadPage('pages/importtpp.html')">
+            <i class="fas fa-fw fa-file-import"></i>
+            <span>Import TPP</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Data Penghasilan</div>
+    
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataGajiPokok">
+            <i class="fas fa-fw fa-money-check-alt"></i>
+            <span>Data Gaji Pokok</span>
+        </a>
+        <div id="collapseDataGajiPokok" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#" onclick="loadPage('pages/gajipokok.html?jenis=pns')">PNS</a>
+                <a class="collapse-item" href="#" onclick="loadPage('pages/gajipokok.html?jenis=pppk')">PPPK</a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataTpp">
+            <i class="fas fa-fw fa-hand-holding-usd"></i>
+            <span>Data TPP</span>
+        </a>
+        <div id="collapseDataTpp" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#" onclick="loadPage('pages/tpp.html?jenis=pns')">PNS</a>
+                <a class="collapse-item" href="#" onclick="loadPage('pages/tpp.html?jenis=pppk')">PPPK</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Pajak (Coretax)</div>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePph21Bulan">
+            <i class="fas fa-fw fa-calculator"></i>
+            <span>PPh21 Bulanan</span>
+        </a>
+        <div id="collapsePph21Bulan" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pph21/bulanan.html?jenis=pns')">PNS</a>
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pph21/bulanan.html?jenis=pppk')">PPPK</a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBupotTahunan">
+            <i class="fas fa-fw fa-file-invoice"></i>
+            <span>Bupot Masa Terakhir</span>
+        </a>
+        <div id="collapseBupotTahunan" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pph21/tahunan_a1.html')">A1 (PPPK)</a>
+                <a class="collapse-item" href="#" onclick="loadPage('pages/pph21/tahunan_a2.html')">A2 (PNS)</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+</aside>

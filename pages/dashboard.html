@@ -1,0 +1,418 @@
+<style>
+    .table-lra th, .table-lra td { vertical-align: middle; font-size: 0.85rem; }
+    .kode-rek { font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #495057; }
+    .text-red { color: #dc3545; }
+    .summary-icon { font-size: 2.5rem; opacity: 0.2; position: absolute; right: 15px; bottom: 15px; }
+    #loader { display: none; }
+</style>
+
+<div class="container-fluid mt-4 mb-5 px-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0">Dashboard Realisasi Anggaran</h3>
+            <span class="text-muted">Kegiatan: 2.19.01.2.02.0001 Penyediaan Gaji dan Tunjangan ASN</span>
+        </div>
+        <div class="form-inline">
+            <select class="form-control mr-2" id="filterBulan">
+                <option value="1">S.d. Januari</option>
+                <option value="2">S.d. Februari</option>
+                <option value="3" selected>S.d. Maret</option>
+                <option value="4">S.d. April</option>
+                <option value="5">S.d. Mei</option>
+                <option value="6">S.d. Juni</option>
+                <option value="7">S.d. Juli</option>
+                <option value="8">S.d. Agustus</option>
+                <option value="9">S.d. September</option>
+                <option value="10">S.d. Oktober</option>
+                <option value="11">S.d. November</option>
+                <option value="12">S.d. Desember</option>
+            </select>
+            <select class="form-control" id="filterTahun"></select>
+        </div>
+    </div>
+
+    <div id="loader" class="text-center mb-4">
+        <div class="spinner-border text-primary" role="status"><span class="sr-only">Memuat Data...</span></div>
+    </div>
+
+    <div class="row mb-4" id="summaryCards">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100 shadow-sm position-relative">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold opacity-75 mb-1">Total Pagu (Rp)</h6>
+                    <h4 class="mb-0" id="cardPagu">0</h4>
+                    <i class="fas fa-wallet summary-icon text-white"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white h-100 shadow-sm position-relative">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold opacity-75 mb-1">Total Realisasi (Rp)</h6>
+                    <h4 class="mb-0" id="cardRealisasi">0</h4>
+                    <i class="fas fa-hand-holding-usd summary-icon text-white"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100 shadow-sm position-relative">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold opacity-75 mb-1">Sisa Pagu (Rp)</h6>
+                    <h4 class="mb-0" id="cardSisa">0</h4>
+                    <i class="fas fa-money-bill-wave summary-icon text-white"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100 shadow-sm position-relative">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold opacity-75 mb-1">Persentase (%)</h6>
+                    <h4 class="mb-0" id="cardPersen">0%</h4>
+                    <i class="fas fa-chart-pie summary-icon text-dark"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-9 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white font-weight-bold d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0"><i class="fas fa-table text-primary mr-2"></i> Rincian Realisasi per Rekening</h5>
+                    <button class="btn btn-sm btn-outline-success" id="btnExportExcel">
+                        <i class="fas fa-file-excel mr-1"></i> Export Excel
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-bordered table-hover table-lra mb-0" id="tableLRA">
+                            <thead class="bg-light text-center" style="position: sticky; top: 0; z-index: 1;">
+                                <tr>
+                                    <th>Kode Rekening</th>
+                                    <th>Uraian</th>
+                                    <th>Pagu (Rp)</th>
+                                    <th>Realisasi (Rp)</th>
+                                    <th>SISA (Rp)</th>
+                                    <th width="80">%</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            
+            <div class="card shadow-sm border-0 mb-4 border-left-success">
+                <div class="card-header bg-white font-weight-bold py-3">
+                    <h6 class="mb-0"><i class="fas fa-shield-alt text-success mr-2"></i> Status Pagu Rekening</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0 text-success font-weight-bold"><i class="fas fa-check-circle mr-1"></i> Aman (>30%)</h6>
+                            <small class="text-muted">Pagu masih tebal</small>
+                        </div>
+                        <h4 class="mb-0 text-success font-weight-bold" id="statusAman">0</h4>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0 text-warning font-weight-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Menipis (10-30%)</h6>
+                            <small class="text-muted">Perlu perhatian</small>
+                        </div>
+                        <h4 class="mb-0 text-warning font-weight-bold" id="statusMenipis">0</h4>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 text-danger font-weight-bold"><i class="fas fa-times-circle mr-1"></i> Kritis (<10%)</h6>
+                            <small class="text-muted">Butuh pergeseran</small>
+                        </div>
+                        <h4 class="mb-0 text-danger font-weight-bold" id="statusKritis">0</h4>
+                    </div>
+
+                    <div id="boxAlertKritis" class="alert alert-danger mt-3 mb-0 p-2" style="display: none; font-size: 0.8rem;">
+                        <strong class="d-block mb-1"><i class="fas fa-bell"></i> Perhatian:</strong>
+                        <ul class="pl-3 mb-0" id="listRekeningKritis"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4 border-left-warning">
+                <div class="card-header bg-white font-weight-bold py-3">
+                    <h6 class="mb-0"><i class="fas fa-file-invoice-dollar text-warning mr-2"></i> Rekap Potongan</h6>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><small class="text-muted d-block">Potongan PPh 21</small><strong>Kas Negara</strong></div>
+                            <span class="text-danger font-weight-bold" id="potonganPph">Rp 0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><small class="text-muted d-block">BPJS Kesehatan</small><strong>BPJS Kes</strong></div>
+                            <span class="text-danger font-weight-bold" id="potonganBpjs">Rp 0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><small class="text-muted d-block">JKK & JKM</small><strong>PT. Taspen</strong></div>
+                            <span class="text-danger font-weight-bold" id="potonganTaspen">Rp 0</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 border-left-info">
+                <div class="card-body">
+                    <h6 class="font-weight-bold text-info mb-3"><i class="fas fa-info-circle mr-2"></i> Informasi Sistem</h6>
+                    <p class="small text-muted mb-1">Pegawai PNS Aktif: <strong class="text-dark" id="textTotalPNS">Memuat...</strong></p>
+                    <p class="small text-muted mb-1">Pegawai PPPK Aktif: <strong class="text-dark" id="textTotalPPPK">Memuat...</strong></p>
+                    <hr>
+                    <p class="small text-muted mb-1">Periode Tampil: <strong id="infoPeriode" class="text-dark">Memuat...</strong></p>
+                    <p class="small text-muted mb-0">Update Terakhir: <br><strong class="text-success" id="textUpdateTerakhir">Menunggu data...</strong></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// 🔥 BUNGKUSAN SAKTI (IIFE) BIAR VARIABEL GAK BENTROK PAS PINDAH MENU 🔥
+(function () {
+    // Definisi Elemen DOM
+    const filterBulan = document.getElementById('filterBulan');
+    const filterTahun = document.getElementById('filterTahun');
+    const tableBody = document.querySelector('#tableLRA tbody');
+    const loader = document.getElementById('loader');
+    const summaryCards = document.getElementById('summaryCards');
+
+    // Elemen Sidebar
+    const elPph = document.getElementById('potonganPph');
+    const elBpjs = document.getElementById('potonganBpjs');
+    const elTaspen = document.getElementById('potonganTaspen');
+    const infoPeriode = document.getElementById('infoPeriode');
+    const textUpdateTerakhir = document.getElementById('textUpdateTerakhir');
+    
+    // Elemen Pegawai Dinamis
+    const textTotalPNS = document.getElementById('textTotalPNS');
+    const textTotalPPPK = document.getElementById('textTotalPPPK');
+
+    // Elemen Status Pagu
+    const elStatusAman = document.getElementById('statusAman');
+    const elStatusMenipis = document.getElementById('statusMenipis');
+    const elStatusKritis = document.getElementById('statusKritis');
+    const boxAlertKritis = document.getElementById('boxAlertKritis');
+    const listRekeningKritis = document.getElementById('listRekeningKritis');
+
+    // Mencegah error kalau elemen belum siap dirender
+    if (!filterTahun) return;
+
+    // Inisialisasi Tahun dan Bulan
+    const currentYear = new Date().getFullYear();
+    for (let i = currentYear; i >= currentYear - 5; i--) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.text = i;
+        if (i === 2026) option.selected = true; 
+        filterTahun.appendChild(option);
+    }
+    filterBulan.value = new Date().getMonth() + 1;
+
+    // Helper Functions
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka || 0);
+    }
+
+    function formatPersen(angka) {
+        return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(angka || 0) + '%';
+    }
+
+    function formatWaktu(isoString) {
+        if (!isoString) return "Baru saja";
+        const date = new Date(isoString);
+        return new Intl.DateTimeFormat('id-ID', { 
+            day: 'numeric', month: 'long', year: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        }).format(date) + ' WIB';
+    }
+
+    // Fungsi Utama Load Data
+    function loadData() {
+        const tahun = filterTahun.value;
+        const bulan = parseInt(filterBulan.value);
+        const textBulan = filterBulan.options[filterBulan.selectedIndex].text;
+
+        infoPeriode.innerText = `${textBulan} ${tahun}`;
+        
+        loader.style.display = 'block';
+        tableBody.innerHTML = '';
+        summaryCards.style.opacity = '0.5';
+
+        // 🔥 Tembak API Pake Karcis Satpam (JWT Token) 🔥
+        fetch(`${API_BASE_URL}/realisasi?tahun=${tahun}&bulan=${bulan}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) { 
+                if(response.status === 401) Auth.logout(); // Tendang kalau token expired
+                throw new Error('Network response was not ok'); 
+            }
+            return response.json();
+        })
+        .then(res => {
+            const data = res.data || [];
+            
+            // Update Waktu dan Jumlah Pegawai dari JSON API
+            let waktuUpdate = res.last_updated ? formatWaktu(res.last_updated) : formatWaktu(new Date().toISOString());
+            textUpdateTerakhir.innerText = waktuUpdate;
+            
+            textTotalPNS.innerText = (res.total_pns || 0) + " Orang";
+            textTotalPPPK.innerText = (res.total_pppk || 0) + " Orang";
+            
+            // Deklarasi Variabel Hitungan
+            let grandTotalPagu = 0; let grandTotalRealisasi = 0; let grandTotalSisa = 0;
+            let totalPph = 0; let totalBpjs = 0; let totalTaspen = 0;
+            let countAman = 0; let countMenipis = 0; let countKritis = 0;
+            let htmlListKritis = '';
+            let html = '';
+
+            // Jika Data Kosong
+            if (data.length === 0) {
+                html = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data realisasi pada periode ini.</td></tr>`;
+                elPph.innerText = "Rp 0"; elBpjs.innerText = "Rp 0"; elTaspen.innerText = "Rp 0";
+                elStatusAman.innerText = "0"; elStatusMenipis.innerText = "0"; elStatusKritis.innerText = "0";
+                boxAlertKritis.style.display = 'none';
+                
+                document.getElementById('cardPagu').innerText = "0";
+                document.getElementById('cardRealisasi').innerText = "0";
+                document.getElementById('cardSisa').innerText = "0";
+                document.getElementById('cardPersen').innerText = "0%";
+            } else {
+                // Looping Data Tabel
+                data.forEach(item => {
+                    grandTotalPagu += item.pagu_anggaran;
+                    grandTotalRealisasi += item.total_realisasi;
+                    grandTotalSisa += item.sisa_anggaran;
+
+                    let realisasiClass = item.total_realisasi > 0 ? "text-red" : "";
+                    
+                    // Hitung Status Pagu (Aman, Menipis, Kritis)
+                    if (item.pagu_anggaran > 0) {
+                        let persenSisa = (item.sisa_anggaran / item.pagu_anggaran) * 100;
+                        if (persenSisa >= 30) {
+                            countAman++;
+                        } else if (persenSisa >= 10) {
+                            countMenipis++;
+                        } else {
+                            countKritis++;
+                            let namaSingkat = item.uraian.replace("Belanja ", "").replace("Tambahan Penghasilan berdasarkan ", "TPP ");
+                            htmlListKritis += `<li>${namaSingkat} <strong>(${persenSisa.toFixed(1)}%)</strong></li>`;
+                        }
+                    }
+
+                    // Buat Baris Tabel HTML
+                    html += `
+                        <tr>
+                            <td class="kode-rek">${item.kode_rekening}</td>
+                            <td>${item.uraian}</td>
+                            <td class="text-right">${formatRupiah(item.pagu_anggaran)}</td>
+                            <td class="text-right ${realisasiClass}">${formatRupiah(item.total_realisasi)}</td>
+                            <td class="text-right">${formatRupiah(item.sisa_anggaran)}</td>
+                            <td class="text-center">${formatPersen(item.persentase)}</td>
+                        </tr>
+                    `;
+
+                    // Jumlahkan Rekap Potongan
+                    if (item.id === 12) totalPph += item.total_realisasi;
+                    else if (item.id === 15 || item.id === 16) totalBpjs += item.total_realisasi;
+                    else if (item.id >= 17 && item.id <= 20) totalTaspen += item.total_realisasi;
+                });
+
+                // Hitung Grand Persentase
+                let grandPersen = grandTotalPagu > 0 ? (grandTotalRealisasi / grandTotalPagu) * 100 : 0;
+
+                // Tambahkan Baris JUMLAH
+                html += `
+                    <tr class="font-weight-bold bg-light">
+                        <td colspan="2" class="text-center">JUMLAH</td>
+                        <td class="text-right">${formatRupiah(grandTotalPagu)}</td>
+                        <td class="text-right text-danger">${formatRupiah(grandTotalRealisasi)}</td>
+                        <td class="text-right">${formatRupiah(grandTotalSisa)}</td>
+                        <td class="text-center">${formatPersen(grandPersen)}</td>
+                    </tr>
+                `;
+
+                // Masukkan ke 4 Kartu Atas
+                document.getElementById('cardPagu').innerText = formatRupiah(grandTotalPagu);
+                document.getElementById('cardRealisasi').innerText = formatRupiah(grandTotalRealisasi);
+                document.getElementById('cardSisa').innerText = formatRupiah(grandTotalSisa);
+                document.getElementById('cardPersen').innerText = formatPersen(grandPersen);
+
+                // Masukkan ke Rekap Potongan
+                elPph.innerText = 'Rp ' + formatRupiah(totalPph);
+                elBpjs.innerText = 'Rp ' + formatRupiah(totalBpjs);
+                elTaspen.innerText = 'Rp ' + formatRupiah(totalTaspen);
+
+                // Masukkan ke Status Pagu
+                elStatusAman.innerText = countAman;
+                elStatusMenipis.innerText = countMenipis;
+                elStatusKritis.innerText = countKritis;
+
+                if (countKritis > 0) {
+                    listRekeningKritis.innerHTML = htmlListKritis;
+                    boxAlertKritis.style.display = 'block';
+                } else {
+                    boxAlertKritis.style.display = 'none';
+                }
+            }
+
+            // Render HTML Tabel
+            tableBody.innerHTML = html;
+            loader.style.display = 'none';
+            summaryCards.style.opacity = '1';
+        })
+        .catch(err => {
+            console.error("Fetch Error:", err);
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data API. Pastikan server Golang sedang berjalan.</td></tr>`;
+            loader.style.display = 'none';
+            summaryCards.style.opacity = '1';
+        });
+    }
+
+    // Trigger Load Data
+    filterBulan.addEventListener('change', loadData);
+    filterTahun.addEventListener('change', loadData);
+    
+    // Load pertama kali
+    loadData();
+
+    // 🔥 FUNGSI EXPORT EXCEL 🔥
+    const btnExport = document.getElementById('btnExportExcel');
+    if (btnExport) {
+        btnExport.addEventListener('click', function () {
+            // Pastikan library XLSX sudah keload sebelum dipanggil
+            if (typeof XLSX === 'undefined') {
+                alert("Library Excel sedang dimuat, coba lagi dalam beberapa detik.");
+                return;
+            }
+            
+            const tabel = document.getElementById('tableLRA');
+            const bulan = filterBulan.options[filterBulan.selectedIndex].text;
+            const tahun = filterTahun.value;
+
+            const wb = XLSX.utils.table_to_book(tabel, { sheet: "LRA" });
+            const fileName = `LRA_Gaji_TPP_${bulan}_${tahun}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        });
+    }
+})();
+</script>

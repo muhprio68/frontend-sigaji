@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 text-primary">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div class="d-none d-sm-inline-block ml-3">
+        <h5 class="mb-0 text-gray-800 font-weight-bold" style="font-size: 1.1rem;">
+            Dinas Kepemudaan dan Olahraga
+        </h5>
+        <div class="small text-muted font-weight-bold mt-1">
+            <i class="far fa-calendar-alt text-primary mr-1"></i> <span id="realtimeDate">...</span>
+            <i class="far fa-clock text-primary ml-2 mr-1"></i> <span id="realtimeClock">...</span>
+        </div>
+    </div>
+
+    <ul class="navbar-nav ml-auto">
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                
+                <div class="d-flex flex-column text-right mr-2 d-none d-lg-inline-block">
+                    <span class="text-gray-800 font-weight-bold small mb-n1" id="navUsername">Memuat...</span>
+                    <span class="text-muted small" id="navUserJabatan" style="font-size: 0.75rem;">...</span>
+                </div>
+                
+                <div class="img-profile rounded-circle d-flex align-items-center justify-content-center bg-primary text-white shadow-sm">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </a>
+            
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item py-2" href="#" data-toggle="modal" data-target="#profilModal">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-primary"></i>
+                    Profil Saya
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item py-2 font-weight-bold text-danger" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                    Keluar
+                </a>
+            </div>
+        </li>
+    </ul>
+</nav>

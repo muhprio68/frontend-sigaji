@@ -1,0 +1,487 @@
+<div class="container mt-4 mb-5"> 
+    <div class="card shadow-sm">
+        <div class="card-header bg-white font-weight-bold d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-file-invoice-dollar text-primary mr-2"></i> Data PPh 21 (Bukti Potong)</h5>
+            
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="font-weight-bold">Jenis Penghasilan</label>
+                    <select id="filterTipe" class="form-control">
+                        <option value="bulanan">Bulanan</option>
+                        <option value="thr">THR</option>
+                        <option value="gaji_13">Gaji 13</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3" id="bulanField">
+                    <label class="font-weight-bold">Bulan</label>
+                    <select id="filterBulan" class="form-control">
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3" selected>Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="font-weight-bold">Tahun</label>
+                    <select id="filterTahun" class="form-control"></select>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-xl-4 col-md-4 mb-3">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pegawai</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPegawai">0 Orang</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-4 mb-3">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1" id="labelSummaryBruto">Total Penghasilan Bruto</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumBruto">Rp 0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-4 mb-3">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1" id="labelSummaryPPh">Total PPh 21 Dipotong</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPPh21">Rp 0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-sm btn-warning font-weight-bold shadow-sm" data-toggle="modal" data-target="#modalGenerateXML" style="color: #000;">
+              <i class="fas fa-file-code mr-1"></i>
+              <span id="labelBtnXML">Generate XML BPMP Coretax</span>
+            </button></div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tablePPh">
+                    <thead class="text-center bg-light">
+                        <tr>
+                            <th width="50">No</th>
+                            <th>NIP</th>
+                            <th>Nama Pegawai</th>
+                            <th>PTKP</th>
+                            <th>Total Bruto</th>
+                            <th class="text-danger">PPh 21</th>
+                            <th width="100">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalGenerateXML" tabindex="-1" aria-labelledby="modalGenerateXMLLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"> 
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title font-weight-bold" id="modalGenerateXMLLabel">
+                    <i class="fas fa-file-code mr-2"></i>Generate XML Coretax
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Silakan tentukan <strong>Tanggal Pemotongan</strong> PPh 21 untuk dimasukkan ke dalam file XML.</p>
+                <div class="form-group">
+                    <label for="inputTglPotongModal" class="font-weight-bold">Tanggal Potong <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="inputTglPotongModal" required>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success font-weight-bold" id="btnDownloadXML">
+                    <i class="fas fa-download mr-1"></i> Download File XML
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetailPegawai" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title font-weight-bold" id="modalDetailLabel">
+                    <i class="fas fa-user-circle mr-2"></i>Detail PPh 21 Pegawai
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr><td width="35%"><strong>Nama Pegawai</strong></td><td width="2%">:</td><td id="bul_detNama"></td></tr>
+                        <tr><td><strong>NIP / NIK</strong></td><td>:</td><td><span id="bul_detNIP"></span> <span class="text-muted">/</span> <span id="bul_detNIK"></span></td></tr>
+                        <tr><td><strong>Jenis Penghasilan</strong></td><td>:</td><td><span id="bul_detJenis" class="font-weight-bold text-primary"></span></td></tr>
+                        <tr><td><strong>Jabatan</strong></td><td>:</td><td id="bul_detJabatan"></td></tr>
+                        <tr><td><strong>Status PTKP</strong></td><td>:</td><td><span id="bul_detPTKP" class="badge badge-primary"></span></td></tr>
+                        <tr><td colspan="3"><hr class="my-2"></td></tr>
+                        <tr><td><strong>Penghasilan Bruto (Gaji & Tunj)</strong></td><td>:</td><td id="bul_detBrutoGaji"></td></tr>
+                        <tr><td><strong>Penghasilan Bruto (TPP)</strong></td><td>:</td><td id="bul_detBrutoTPP"></td></tr>
+                        <tr class="bg-light">
+                            <td><strong>Total Penghasilan Bruto</strong></td>
+                            <td>:</td>
+                            <td id="bul_detTotalBruto" class="font-weight-bold text-success"></td>
+                        </tr>
+                        <tr><td colspan="3"><hr class="my-2"></td></tr>
+                        <tr><td><strong>Tarif Efektif Rata-Rata (TER)</strong></td><td>:</td><td id="bul_detTarif"></td></tr>
+                        <tr class="table-danger">
+                            <td class="font-weight-bold">Potongan PPh 21</td>
+                            <td>:</td>
+                            <td id="bul_detPPh21" class="font-weight-bold text-danger" style="font-size: 1.1rem;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// BUNGKUSAN SAKTI (IIFE)
+(function () {
+
+    let allData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    const tipeSelect = document.getElementById("filterTipe");
+    const bulanSelect = document.getElementById("filterBulan");
+    const tahunSelect = document.getElementById("filterTahun");
+    const bulanField = document.getElementById("bulanField");
+    const tbody = document.querySelector("#tablePPh tbody");
+
+    // Tangkap param dari URL di SPA
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+    const jenisParam = params.get("jenis");
+
+    const statusMap = { pns: 1, pppk: 2 };
+    const jenis = statusMap[jenisParam?.toLowerCase()] || 0;
+
+    if(!tahunSelect) return;
+
+    const currentYear = new Date().getFullYear();
+    bulanSelect.value = new Date().getMonth() + 1; 
+
+    // Siapin elemen teks tombolnya
+    const labelBtnXML = document.getElementById("labelBtnXML");
+
+    if (labelBtnXML) {
+        if (jenisParam === "pns") {
+            labelBtnXML.innerText = "Generate XML BPMP Coretax (PNS)";
+        } else if (jenisParam === "pppk") {
+            labelBtnXML.innerText = "Generate XML BPMP Coretax (PPPK)";
+        } else {
+            // Default kalau gak ada parameter jenis
+            labelBtnXML.innerText = "Generate XML BPMP Coretax"; 
+        }
+    }
+
+    for (let y = currentYear - 5; y <= currentYear; y++) {
+        let option = document.createElement("option");
+        option.value = y;
+        option.text = y;
+        if (y === currentYear) option.selected = true;
+        tahunSelect.appendChild(option);
+    }
+
+    function toggleBulan() {
+        const tipe = tipeSelect.value;
+        if (tipe === "thr" || tipe === "gaji_13") {
+            bulanField.style.display = "none";
+        } else {
+            bulanField.style.display = "block";
+        }
+    }
+
+    tipeSelect.addEventListener("change", function () {
+        toggleBulan();
+        loadData();
+    });
+    bulanSelect.addEventListener("change", loadData);
+    tahunSelect.addEventListener("change", loadData);
+
+    function formatRupiah(angka) {
+        return "Rp " + (angka || 0).toLocaleString("id-ID");
+    }
+
+    function loadData() {
+        let tipe = tipeSelect.value;
+        let bulan = bulanSelect.value;
+        let tahun = tahunSelect.value;
+        
+        let url = `${API_BASE_URL}/pph21?tahun=${tahun}`;
+        if (jenis !== 0) url += `&jenis=${jenis}`;
+        if (tipe === "" || tipe === "bulanan") url += `&bulan=${bulan}`;
+        if (tipe !== "") url += `&tipe=${tipe}`;
+
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data...</td></tr>`;
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then(res => {
+            if(!res.ok) {
+                if(res.status === 401) Auth.logout();
+                throw new Error("Gagal ambil data API");
+            }
+            return res.json();
+        })
+        .then(res => {
+            const result = res.data; 
+
+            if (result && result.summary) {
+                allData = result.list_pegawai || [];
+
+                document.getElementById("sumPegawai").innerText = (result.summary.total_pegawai || 0) + " Orang";
+                document.getElementById("sumBruto").innerText = formatRupiah(result.summary.grand_total_bruto);
+                document.getElementById("sumPPh21").innerText = formatRupiah(result.summary.grand_total_pph21);
+
+                let tipeTxt = tipeSelect.options[tipeSelect.selectedIndex].text;
+                document.getElementById("labelSummaryBruto").innerText = "Total Bruto (" + tipeTxt + ")";
+                document.getElementById("labelSummaryPPh").innerText = "Total PPh 21 (" + tipeTxt + ")";
+            } else {
+                allData = [];
+                document.getElementById("sumPegawai").innerText = "0 Orang";
+                document.getElementById("sumBruto").innerText = "Rp 0";
+                document.getElementById("sumPPh21").innerText = "Rp 0";
+            }
+
+            currentPage = 1;
+            displayTable();
+            setupPagination();
+        })
+        .catch(error => {
+            console.error("Gagal fetch data PPh21:", error);
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">Terjadi kesalahan koneksi</td></tr>`;
+        });
+    }
+
+    function displayTable() {
+        tbody.innerHTML = "";
+
+        if (!allData || allData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada data untuk periode ini</td></tr>`;
+            return;
+        }
+
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+        let paginatedItems = allData.slice(start, end);
+
+        let html = "";
+        paginatedItems.forEach((item, index) => {
+            let actualIndex = start + index;
+            html += `
+                <tr>
+                    <td class="text-center align-middle">${actualIndex + 1}</td>
+                    <td class="align-middle">${item.nip || '-'}</td>
+                    <td class="align-middle">${item.nama || '-'}</td>
+                    <td class="text-center font-weight-bold align-middle">${item.status_ptkp || '-'}</td>
+                    <td class="text-right font-weight-bold align-middle">${formatRupiah(item.total_bruto)}</td>
+                    <td class="text-right text-danger font-weight-bold align-middle">${formatRupiah(item.pph21)}</td>
+                    <td class="text-center align-middle">
+                        <button onclick="showDetailModal(${actualIndex})" class="btn btn-info btn-sm shadow-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function setupPagination() {
+        let pageCount = Math.ceil(allData.length / rowsPerPage);
+        let pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        if (pageCount <= 1) return;
+
+        for (let i = 1; i <= pageCount; i++) {
+            pagination.innerHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(event, ${i})">${i}</a>
+                </li>
+            `;
+        }
+    }
+
+   const btnDownloadXML = document.getElementById("btnDownloadXML");
+    const inputTglPotongModal = document.getElementById("inputTglPotongModal");
+    if(inputTglPotongModal) inputTglPotongModal.value = new Date().toISOString().split('T')[0];
+
+    if(btnDownloadXML) {
+        btnDownloadXML.addEventListener("click", function () {
+            let tipe = tipeSelect.value;
+            let bulan = bulanSelect.value;
+            let tahun = tahunSelect.value;
+            let tglPotong = inputTglPotongModal.value;
+
+            if (!tglPotong) {
+                alert("Tanggal Potong wajib diisi!");
+                inputTglPotongModal.focus();
+                return;
+            }
+
+            // 1. Susun URL (TANPA nyelipin token di URL)
+            let downloadUrl = `${API_BASE_URL}/pph21/export-xmlbulan?tahun=${tahun}&tgl_potong=${tglPotong}`;
+            if (jenis !== 0) downloadUrl += `&jenis=${jenis}`;
+            if (tipe !== "") downloadUrl += `&tipe=${tipe}`;
+            if (tipe === "" || tipe === "bulanan") downloadUrl += `&bulan=${bulan}`;
+
+            // 2. Ubah tombol jadi status loading
+            let originalText = btnDownloadXML.innerHTML;
+            btnDownloadXML.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
+            btnDownloadXML.disabled = true;
+
+            // 3. Tembak API pakai Fetch & Header Authorization
+            fetch(downloadUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${Auth.getToken()}` // Karcis satpam wajib di Header
+                }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    if (res.status === 401) Auth.logout(); // Tendang kalau token mati
+                    throw new Error("Gagal generate XML");
+                }
+                return res.blob(); // Ubah response jadi file
+            })
+            .then(blob => {
+                // 4. Bikin link download palsu/gaib di background
+                const urlBlob = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = urlBlob;
+                
+                // Dinamis nama file
+                let strBulan = (tipe === "" || tipe === "bulanan") ? `Bulan_${bulan}` : tipe.toUpperCase();
+                a.download = `Coretax_PPH21_${strBulan}_${tahun}.xml`; 
+                
+                document.body.appendChild(a);
+                a.click(); // Paksa browser klik download
+                
+                // 5. Bersih-bersih memori & UI
+                a.remove();
+                window.URL.revokeObjectURL(urlBlob); 
+
+                btnDownloadXML.innerHTML = originalText;
+                btnDownloadXML.disabled = false;
+
+                // Tutup Modal & hapus backdrop abu-abu SPA
+                $('#modalGenerateXML').modal('hide');
+                setTimeout(() => {
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('padding-right', '');
+                }, 300);
+            })
+            .catch(err => {
+                console.error("Error Download:", err);
+                alert("Gagal mengunduh file XML. Pastikan token aktif dan data tersedia.");
+                
+                // Balikin tombol kalau error
+                btnDownloadXML.innerHTML = originalText;
+                btnDownloadXML.disabled = false;
+            });
+        });
+    }
+
+    window.showDetailModal = function(index) {
+        let item = allData[index];
+        let tipeTxt = tipeSelect.options[tipeSelect.selectedIndex].text;
+        
+        document.getElementById("bul_detNama").innerText = item.nama;
+        document.getElementById("bul_detNIP").innerText = item.nip;
+        document.getElementById("bul_detNIK").innerText = item.nik || '-';
+        document.getElementById("bul_detJenis").innerText = "PPh 21 " + tipeTxt;
+        document.getElementById("bul_detJabatan").innerText = item.jabatan || '-';
+        document.getElementById("bul_detPTKP").innerText = item.status_ptkp || '-';
+        
+        document.getElementById("bul_detBrutoGaji").innerText = formatRupiah(item.bruto_gaji);
+        document.getElementById("bul_detBrutoTPP").innerText = formatRupiah(item.bruto_tpp);
+        document.getElementById("bul_detTotalBruto").innerText = formatRupiah(item.total_bruto);
+        
+        let ratePersen = item.tarif_ter ? (item.tarif_ter * 100) : 0;
+        document.getElementById("bul_detTarif").innerText = ratePersen.toFixed(2).replace(/\.00$/, '') + " %";
+        
+        document.getElementById("bul_detPPh21").innerText = formatRupiah(item.pph21);
+
+        $('#modalDetailPegawai').modal('show');
+    };
+
+    window.changePage = function(event, page) {
+        event.preventDefault(); 
+        currentPage = page;
+        displayTable();
+        setupPagination();
+    }
+
+    // Inisialisasi awal
+    toggleBulan();
+    loadData();
+})();
+</script>

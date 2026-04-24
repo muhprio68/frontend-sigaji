@@ -1,0 +1,69 @@
+/* Styling biar logo Bojonegoro gak gepeng pas sidebar ditutup */
+.sidebar.toggled .sidebar-brand .sidebar-brand-icon img {
+    width: 25px !important;
+    height: auto !important;
+}
+
+/* Formula Paksa Sidebar Full Height */
+#wrapper {
+    display: flex;
+    min-height: 100vh; /* Minimal setinggi layar */
+    height: auto;      /* Bisa melar lebih dari layar */
+    align-items: stretch;
+}
+
+#accordionSidebar {
+    /* Biar warna birunya ditarik sampai bawah ngikutin wrapper */
+    min-height: 100%; 
+    height: auto !important;
+    
+    /* Tambahan biar pas scroll tetap stabil */
+    display: flex;
+    flex-direction: column;
+}
+
+#content-wrapper {
+    flex: 1; /* Biar konten ngambil sisa ruang yang ada */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Fix untuk mobile: pastikan sidebar gak nutupin layar tapi tetap full */
+@media (max-width: 768px) {
+    #wrapper {
+        min-height: 100vh;
+    }
+}
+
+/* Pastikan Topbar dan Tombol Navigasi selalu di lapisan paling atas */
+.topbar {
+    z-index: 1000 !important;
+    position: relative !important;
+}
+
+#sidebarToggle, 
+#sidebarToggleTop, 
+.topbar .nav-item {
+    z-index: 1001 !important;
+    position: relative !important;
+    cursor: pointer !important;
+    pointer-events: auto !important; /* Paksa klik tembus */
+}
+
+/* Pastikan wrapper konten tidak menutupi header */
+#content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+/* Solusi kalau modal sering stuck di belakang layar abu-abu */
+.modal {
+    overflow-y: auto !important;
+}
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+.modal {
+    z-index: 1050 !important;
+}

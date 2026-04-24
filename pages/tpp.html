@@ -1,0 +1,537 @@
+<style>
+    .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
+    .border-left-success { border-left: 0.25rem solid #1cc88a !important; }
+    .border-left-info { border-left: 0.25rem solid #36b9cc !important; }
+    .border-left-danger { border-left: 0.25rem solid #e74a3b !important; }
+
+    /* CSS Khusus agar saat di-print formatnya jadi dokumen A4/F4 */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+        }
+        body {
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important;
+        }
+        body * {
+            visibility: hidden;
+        }
+        #modalDetailTpp {
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #modalDetailTpp .modal-dialog {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #modalDetailTpp .modal-content {
+            border: none;
+            box-shadow: none !important;
+            width: 100%;
+        }
+        #modalDetailTpp .modal-content * {
+            visibility: visible;
+        }
+        .modal-footer, .close {
+            display: none !important;
+        }
+        .shadow, .shadow-sm, .shadow-lg {
+            box-shadow: none !important;
+        }
+        .bg-primary { background-color: #4e73df !important; color: white !important; }
+        .bg-success { background-color: #1cc88a !important; color: white !important; }
+        .bg-light { background-color: #f8f9fc !important; }
+        
+        .print-signature {
+            page-break-inside: avoid;
+            margin-top: 50px !important;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h3 class="card-title font-weight-bold mb-0">Data TPP Pegawai</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+            <div class="col-md-3">
+              <label class="font-weight-bold">Jenis</label>
+              <select id="filterTipe" class="form-control">
+                <option value="bulanan">Bulanan</option>
+                <option value="thr">THR</option>
+                <option value="gaji_13">Gaji 13</option>
+              </select>
+            </div>
+
+            <div class="col-md-3" id="bulanField">
+              <label class="font-weight-bold">Bulan</label>
+              <select id="filterBulan" class="form-control">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7">Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="font-weight-bold">Tahun</label>
+              <select id="filterTahun" class="form-control"></select>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pegawai</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPegawai">0 Orang</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Bruto TPP</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumBruto">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Potongan</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumPotongan">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total TPP Bersih</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="sumBersih">Rp 0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover" id="tableGaji">
+                    <thead class="text-center bg-light">
+                        <tr>
+                           <th width="50">No</th>
+                            <th>NIP</th>
+                            <th class="text-left">Nama</th>
+                            <th width="150">Bruto TPP</th>
+                            <th width="150">Total Potongan</th>
+                            <th width="150">TPP Bersih</th>
+                            <th width="80">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <nav>
+                <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetailTpp" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title font-weight-bold"><i class="fas fa-file-invoice-dollar mr-2"></i> Slip Rincian TPP</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <div class="text-center mb-4 d-none d-print-block">
+            <h4 class="font-weight-bold text-uppercase mb-1">SLIP PEMBAYARAN TAMBAHAN PENGHASILAN PEGAWAI (TPP)</h4>
+            <p class="mb-0 text-muted">Berdasarkan Peraturan yang Berlaku</p>
+            <hr style="border: 1px solid black;">
+        </div>
+
+        <div class="card bg-light border-0 mb-4 shadow-sm">
+            <div class="card-body py-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted small">Nama Pegawai</p>
+                        <h6 class="font-weight-bold mb-2" id="tpp_dNama">-</h6>
+                        <p class="mb-0 text-muted small">NIP</p>
+                        <h6 class="font-weight-bold mb-0" id="tpp_dNip">-</h6>
+                    </div>
+                    <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                        <p class="mb-0 text-muted small">Periode Pembayaran</p>
+                        <h5 class="font-weight-bold text-primary mb-0 mt-1" id="tpp_dPeriode">-</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h6 class="font-weight-bold text-success border-bottom pb-2 mb-3"><i class="fas fa-plus-circle mr-1"></i> PENERIMAAN</h6>
+                
+                <div class="d-flex justify-content-between mb-2 small"><span>Beban Kerja</span> <span id="tpp_dBeban" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Prestasi Kerja</span> <span id="tpp_dPrestasi" class="font-weight-bold"></span></div>
+                <div class="d-flex justify-content-between mb-2 small"><span>Kondisi Kerja</span> <span id="tpp_dKondisi" class="font-weight-bold"></span></div>
+                
+                <div class="mt-3 mb-2 text-muted small font-italic">Tunj. PPh & Jaminan (Penambah):</div>
+                <div class="d-flex justify-content-between mb-2 small text-muted" id="tpp_rowTunjPph"><span>Tunjangan PPh 21</span> <span id="tpp_dTunjpph"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>BPJS Kesehatan 4% (Pemda)</span> <span id="tpp_dTunjbpjs4"></span></div>
+
+                <div class="d-flex justify-content-between mt-4 pt-2 border-top border-success font-weight-bold text-success" style="font-size: 1.1em;">
+                    <span>TOTAL BRUTO</span> <span id="tpp_dBruto"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h6 class="font-weight-bold text-danger border-bottom pb-2 mb-3"><i class="fas fa-minus-circle mr-1"></i> POTONGAN</h6>
+                
+                <div class="d-flex justify-content-between mb-2 small"><span>Potongan BPJS 1%</span> <span id="tpp_dPotbpjs1" class="font-weight-bold"></span></div>
+                
+                <div class="mt-3 mb-2 text-muted small font-italic" id="labelInOut">Potongan In-Out (Sesuai Jaminan):</div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Potongan PPh 21</span> <span id="tpp_dPotpph"></span></div>
+                <div class="d-flex justify-content-between mb-2 small text-muted"><span>Potongan BPJS 4%</span> <span id="tpp_dPotbpjs4"></span></div>
+                
+                <div class="d-flex justify-content-between mt-4 pt-2 border-top border-danger font-weight-bold text-danger" style="font-size: 1.1em;">
+                    <span>TOTAL POTONGAN</span> <span id="tpp_dTotalPotongan"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-success text-white mt-4 border-0 shadow">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3">
+                <h5 class="mb-2 mb-md-0 font-weight-bold text-uppercase">TPP Bersih (Take Home Pay)</h5>
+                <h3 class="mb-0 font-weight-bold" id="tpp_dBersih">Rp 0</h3>
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-4 print-signature d-none d-print-flex">
+            <div class="col-7">
+                <p class="text-muted small font-italic mb-0">Catatan:</p>
+                <p class="text-muted small font-italic">Pajak PPh Pasal 21 dan Jaminan Kesehatan telah dipotong sesuai dengan peraturan yang berlaku.</p>
+            </div>
+            <div class="col-5 text-center">
+                <p class="mb-1">................................., ...........................</p>
+                <p class="mb-5">Bendahara Pengeluaran,</p>
+                <br><br><br>
+                <h6 class="font-weight-bold mb-0 text-decoration-underline">......................................................</h6>
+                <p class="mb-0">NIP. ..............................................</p>
+            </div>
+        </div>
+
+      </div>
+      <div class="modal-footer bg-light border-0 d-print-none">
+         <button type="button" class="btn btn-secondary shadow-sm font-weight-bold" data-dismiss="modal">Tutup</button>
+         <button type="button" class="btn btn-primary shadow-sm font-weight-bold" onclick="window.print()">
+             <i class="fas fa-print mr-1"></i> Cetak Dokumen
+         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// BUNGKUSAN SAKTI (IIFE) 
+(function () {
+    let allData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    const bulanSelect = document.getElementById("filterBulan");
+    const tahunSelect = document.getElementById("filterTahun");
+    const tipeSelect = document.getElementById("filterTipe");
+    const bulanField = document.getElementById("bulanField");
+    const tbody = document.querySelector("#tableGaji tbody");
+
+    // Tangkap parameter URL
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+    const jenisParam = params.get("jenis");
+
+    const statusMap = { pns: 1, pppk: 2 };
+    const jenis = statusMap[jenisParam?.toLowerCase()] || 0;
+
+    if(!tahunSelect) return;
+
+    const currentYear = new Date().getFullYear();
+    bulanSelect.value = 1;
+
+    for (let y = currentYear - 5; y <= currentYear; y++) {
+        let option = document.createElement("option");
+        option.value = y;
+        option.text = y;
+        if (y === currentYear) option.selected = true;
+        tahunSelect.appendChild(option);
+    }
+
+    bulanSelect.addEventListener("change", loadData);
+    tahunSelect.addEventListener("change", loadData);
+    tipeSelect.addEventListener("change", function () {
+        toggleBulan();
+        loadData();
+    });
+
+    function formatRupiah(angka) {
+        return "Rp " + (angka || 0).toLocaleString("id-ID");
+    }
+    
+    function toggleBulan() {
+        const tipe = tipeSelect.value;
+        if (tipe === "thr" || tipe === "gaji_13") {
+            bulanField.style.display = "none";
+        } else {
+            bulanField.style.display = "block";
+        }
+    }
+
+    function updateSummaryCards() {
+        let sumPegawai = allData.length;
+        let sumBruto = 0;
+        let sumPotongan = 0;
+        let sumBersih = 0;
+
+        allData.forEach(item => {
+            sumBruto += item.bruto_tpp || 0;
+            sumPotongan += item.potongan_tpp || 0;
+            sumBersih += item.tpp_bersih || 0;
+        });
+
+        document.getElementById("sumPegawai").innerText = sumPegawai + " Orang";
+        document.getElementById("sumBruto").innerText = formatRupiah(sumBruto);
+        document.getElementById("sumPotongan").innerText = formatRupiah(sumPotongan);
+        document.getElementById("sumBersih").innerText = formatRupiah(sumBersih);
+    }
+
+    function loadData() {
+        let bulan = bulanSelect.value;
+        let tahun = tahunSelect.value;
+        let tipe = tipeSelect.value;
+
+        // Susun URL
+        let url = `${API_BASE_URL}/tpp?tahun=${tahun}`;
+        if (jenis !== 0) url += `&jenis=${jenis}`;
+        if (tipe === "" || tipe === "bulanan") url += `&bulan=${bulan}`;
+        if (tipe !== "") url += `&tipe=${tipe}`;
+
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
+
+        // Fetch dengan Karcis Satpam JWT
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then((res) => {
+            if (!res.ok) {
+                if(res.status === 401) Auth.logout();
+                throw new Error("Gagal load API");
+            }
+            return res.json();
+        })
+        .then((res) => {
+            allData = Array.isArray(res) ? res : res.data || [];
+            updateSummaryCards();
+            currentPage = 1;
+            displayTable();
+            setupPagination();
+        })
+        .catch((error) => {
+            console.error("Gagal fetch data:", error);
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data</td></tr>`;
+            allData = [];
+            updateSummaryCards();
+        });
+    }
+
+    function displayTable() {
+        tbody.innerHTML = "";
+
+        if (allData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada data TPP pada periode ini</td></tr>`;
+            return;
+        }
+
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+        let paginatedItems = allData.slice(start, end);
+
+        paginatedItems.forEach((item, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="text-center align-middle">${start + index + 1}</td>
+                    <td class="align-middle">${item.nip}</td>
+                    <td class="align-middle text-left">${item.nama}</td>
+                    <td class="align-middle text-right">${formatRupiah(item.bruto_tpp)}</td>
+                    <td class="align-middle text-right text-danger">${formatRupiah(item.potongan_tpp)}</td>
+                    <td class="align-middle text-right font-weight-bold text-success">${formatRupiah(item.tpp_bersih)}</td>
+                    <td class="text-center align-middle">
+                        <button onclick="showTpp(${item.id})" class="btn btn-info btn-sm shadow-sm" title="Lihat Rincian">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function setupPagination() {
+        let pageCount = Math.ceil(allData.length / rowsPerPage);
+        let pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        if (pageCount <= 1) return;
+
+        for (let i = 1; i <= pageCount; i++) {
+            pagination.innerHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${i})">${i}</a>
+                </li>
+            `;
+        }
+    }
+
+    window.changePage = function(page) {
+        currentPage = page;
+        displayTable();
+        setupPagination();
+    }
+
+   window.showTpp = function (id) {
+        fetch(`${API_BASE_URL}/tpp/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        })
+        .then((res) => {
+            if (!res.ok) {
+                if(res.status === 401) Auth.logout();
+                throw new Error("Gagal load Detail");
+            }
+            return res.json();
+        })
+        .then((item) => {
+            const dataItem = item.data ? item.data : item;
+
+            // NIP & Nama
+            const nip = dataItem.nip || (dataItem.Pegawai ? dataItem.Pegawai.nip : "-");
+            const nama = dataItem.nama || (dataItem.Pegawai ? dataItem.Pegawai.nama : "-");
+            document.getElementById("tpp_dNip").innerText = nip;
+            document.getElementById("tpp_dNama").innerText = nama;
+
+            // Periode
+            let strTipe = (dataItem.jenis_penghasilan || "Bulanan").toUpperCase();
+            let namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const bulanIdx = parseInt(dataItem.bulan) || 0;
+            const namaBulanStr = bulanIdx > 0 && bulanIdx <= 12 ? namaBulan[bulanIdx] : "";
+            const tahunStr = dataItem.tahun || "";
+            document.getElementById("tpp_dPeriode").innerText = "TPP " + strTipe + " " + namaBulanStr + " " + tahunStr;
+
+            // Logika Hide/Show (ID ini juga harus diganti di HTML ya)
+            const rowTunjPph = document.getElementById("tpp_rowTunjPph");
+            const labelInOut = document.getElementById("tpp_labelInOut");
+            if (jenis === 2) { // 2 = PPPK
+                if(rowTunjPph) rowTunjPph.style.display = "none";
+                if(labelInOut) labelInOut.style.display = "none";
+            } else {
+                if(rowTunjPph) rowTunjPph.style.display = "flex";
+                if(labelInOut) labelInOut.style.display = "block";
+            }
+
+            // Penerimaan
+            document.getElementById("tpp_dBeban").innerText = formatRupiah(dataItem.beban_kerja || 0);
+            document.getElementById("tpp_dPrestasi").innerText = formatRupiah(dataItem.prestasi_kerja || 0);
+            document.getElementById("tpp_dKondisi").innerText = formatRupiah(dataItem.kondisi_kerja || 0);
+            document.getElementById("tpp_dTunjbpjs4").innerText = formatRupiah(dataItem.tunj_bpjs4 || 0);
+            document.getElementById("tpp_dTunjpph").innerText = formatRupiah(dataItem.tunj_pph21 || 0);
+            document.getElementById("tpp_dBruto").innerText = formatRupiah(dataItem.bruto_tpp || 0);
+            
+            // Potongan
+            document.getElementById("tpp_dPotbpjs1").innerText = formatRupiah(dataItem.pot_bpjs1 || 0);
+            document.getElementById("tpp_dPotpph").innerText = formatRupiah(dataItem.pot_pph21 || 0);
+            document.getElementById("tpp_dPotbpjs4").innerText = formatRupiah(dataItem.pot_bpjs4 || 0);
+
+            // Hitung Total Potongan & Bersih
+            let potBpjs1 = parseFloat(dataItem.pot_bpjs1) || 0;
+            let potPph21 = parseFloat(dataItem.pot_pph21) || 0;
+            let potBpjs4 = parseFloat(dataItem.pot_bpjs4) || 0;
+            let hitungPotongan = potBpjs1 + potPph21 + potBpjs4;
+
+            let totalPot = dataItem.potongan_tpp !== undefined ? dataItem.potongan_tpp : hitungPotongan;
+            document.getElementById("tpp_dTotalPotongan").innerText = formatRupiah(totalPot || 0);
+            document.getElementById("tpp_dBersih").innerText = formatRupiah(dataItem.tpp_bersih || 0);
+
+            $("#modalDetailTpp").modal("show");
+        })
+        .catch((err) => {
+            console.error("Gagal ambil detail:", err);
+            alert("Gagal mengambil detail TPP. Pastikan token masih aktif.");
+        });
+    };
+
+    // Init
+    toggleBulan();
+    loadData();
+})();
+</script>

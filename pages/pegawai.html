@@ -1,0 +1,345 @@
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">Data Pegawai</h3>
+            <button class="btn btn-success" onclick="tambahPegawai()">
+                <i class="fas fa-plus"></i> Tambah Pegawai
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-6">
+                    <strong>Total Pegawai: <span id="totalPegawai">0</span> Orang</strong>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama atau NIP..." oninput="searchPegawai()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="tablePegawai">
+                    <thead class="text-center">
+                        <tr>
+                            <th width="50">No</th>
+                            <th>NIP</th>
+                            <th>Nama</th>
+                            <th>Jabatan</th>
+                            <th>Status</th>
+                            <th>PTKP</th>
+                            <th width="140">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTambah" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Tambah Pegawai</h5>
+                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahPegawai">
+                    <div class="form-group">
+                        <label>NIP</label>
+                        <input type="text" class="form-control" id="tambahNip">
+                    </div>
+                    <div class="form-group">
+                        <label>NIK</label>
+                        <input type="text" class="form-control" id="tambahNik">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input type="text" class="form-control" id="tambahNama">
+                    </div>
+                    <div class="form-group">
+                        <label>Jabatan</label>
+                        <input type="text" class="form-control" id="tambahJabatan">
+                    </div>
+                    <div class="form-group">
+                        <label>Status ASN</label>
+                        <select class="form-control" id="tambahStatus">
+                            <option value="1">PNS</option>
+                            <option value="2">PPPK</option>
+                            <option value="3">CPNS</option>
+                            <option value="4">Non ASN</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Golongan</label>
+                        <input type="text" class="form-control" id="tambahGolongan">
+                    </div>
+                    <div class="form-group">
+                        <label>Status PTKP</label>
+                        <select class="form-control" id="tambahPtkp"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea class="form-control" id="tambahAlamat"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" onclick="simpanPegawai()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetail" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Detail Pegawai</h5>
+                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <tr><th width="200">NIP</th><td id="detailNip"></td></tr>
+                    <tr><th>NIK</th><td id="detailNik"></td></tr>
+                    <tr><th>Nama</th><td id="detailNama"></td></tr>
+                    <tr><th>Jabatan</th><td id="detailJabatan"></td></tr>
+                    <tr><th>Status ASN</th><td id="detailStatus"></td></tr>
+                    <tr><th>Golongan</th><td id="detailGolongan"></td></tr>
+                    <tr><th>Status PTKP</th><td id="detailPtkp"></td></tr>
+                    <tr><th>Alamat</th><td id="detailAlamat"></td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEdit" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Edit Pegawai</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group"><label>NIP</label><input type="text" class="form-control" id="editNip"></div>
+                <div class="form-group"><label>NIK</label><input type="text" class="form-control" id="editNik"></div>
+                <div class="form-group"><label>Nama</label><input type="text" class="form-control" id="editNama"></div>
+                <div class="form-group"><label>Jabatan</label><input type="text" class="form-control" id="editJabatan"></div>
+                <div class="form-group">
+                    <label>Status ASN</label>
+                    <select class="form-control" id="editStatus">
+                        <option value="1">PNS</option>
+                        <option value="2">PPPK</option>
+                        <option value="3">CPNS</option>
+                        <option value="4">Non ASN</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Golongan</label><input type="text" class="form-control" id="editGolongan"></div>
+                <div class="form-group"><label>Status PTKP</label><select class="form-control" id="editPtkp"></select></div>
+                <div class="form-group"><label>Alamat</label><textarea class="form-control" id="editAlamat"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-warning" onclick="updatePegawai()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    let allData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    const params = new URLSearchParams(window.location.search);
+    const jenis = params.get("jenis");
+    const statusMap = { pns: 1, pppk: 2 };
+    const ptkpList = ["TK/0","TK/1","TK/2","TK/3","K/0","K/1","K/2","K/3"];
+
+    function loadData() {
+        let url = `${API_BASE_URL}/pegawai`;
+        if (jenis && statusMap[jenis.toLowerCase()]) {
+            url += "?jenis=" + statusMap[jenis.toLowerCase()];
+        }
+
+        fetch(url, {
+            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            allData = Array.isArray(data) ? data : (data.data || []);
+            filteredData = [...allData];
+            document.getElementById("totalPegawai").innerText = allData.length;
+            displayTable();
+            setupPagination();
+        });
+    }
+
+    window.searchPegawai = function() {
+        const keyword = document.getElementById("searchInput").value.toLowerCase();
+        filteredData = allData.filter(item => 
+            item.nama.toLowerCase().includes(keyword) || 
+            item.nip.includes(keyword)
+        );
+        currentPage = 1;
+        displayTable();
+        setupPagination();
+    }
+
+    function displayTable() {
+        let tbody = document.querySelector("#tablePegawai tbody");
+        tbody.innerHTML = "";
+        let start = (currentPage - 1) * rowsPerPage;
+        let paginatedItems = filteredData.slice(start, start + rowsPerPage);
+
+        paginatedItems.forEach((item, index) => {
+            let statusLabel = item.status_asn == 1 ? '<span class="badge badge-success">PNS</span>' : 
+                             (item.status_asn == 2 ? '<span class="badge badge-warning">PPPK</span>' : 
+                             (item.status_asn == 3 ? '<span class="badge badge-info">CPNS</span>' : 
+                             '<span class="badge badge-secondary">Non ASN</span>'));
+
+            tbody.innerHTML += `
+                <tr>
+                    <td class="text-center">${start + index + 1}</td>
+                    <td>${item.nip}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.jabatan}</td>
+                    <td class="text-center">${statusLabel}</td>
+                    <td class="text-center">${item.status_ptkp}</td>
+                    <td class="text-center">
+                        <button onclick="showDetail(${item.id})" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button onclick="editPegawai(${item.id})" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+                        <button onclick="deletePegawai(${item.id})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    window.showDetail = function(id) {
+        fetch(`${API_BASE_URL}/pegawai/${id}`, { headers: { 'Authorization': `Bearer ${Auth.getToken()}` } })
+            .then(res => res.json())
+            .then(item => {
+                const statusMapStr = { 1: "PNS", 2: "PPPK", 3: "CPNS" };
+                document.getElementById("detailNip").innerText = item.nip;
+                document.getElementById("detailNik").innerText = item.nik;
+                document.getElementById("detailNama").innerText = item.nama;
+                document.getElementById("detailJabatan").innerText = item.jabatan;
+                document.getElementById("detailStatus").innerText = statusMapStr[item.status_asn] || "Non ASN";
+                document.getElementById("detailGolongan").innerText = item.golongan;
+                document.getElementById("detailPtkp").innerText = item.status_ptkp;
+                document.getElementById("detailAlamat").innerText = item.alamat;
+                $('#modalDetail').modal('show');
+            });
+    }
+
+    window.tambahPegawai = function() {
+        document.getElementById("formTambahPegawai").reset();
+        generatePtkpOptions("tambahPtkp", null);
+        $('#modalTambah').modal('show');
+    }
+
+    window.simpanPegawai = function() {
+        const data = {
+            nip: document.getElementById("tambahNip").value,
+            nik: document.getElementById("tambahNik").value,
+            nama: document.getElementById("tambahNama").value,
+            jabatan: document.getElementById("tambahJabatan").value,
+            status_asn: parseInt(document.getElementById("tambahStatus").value),
+            golongan: document.getElementById("tambahGolongan").value,
+            status_ptkp: document.getElementById("tambahPtkp").value,
+            alamat: document.getElementById("tambahAlamat").value
+        };
+        fetch(`${API_BASE_URL}/pegawai`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${Auth.getToken()}` },
+            body: JSON.stringify(data)
+        }).then(() => { $('#modalTambah').modal('hide'); loadData(); });
+    }
+
+    window.editPegawai = function(id) {
+        fetch(`${API_BASE_URL}/pegawai/${id}`, { headers: { 'Authorization': `Bearer ${Auth.getToken()}` } })
+            .then(res => res.json())
+            .then(item => {
+                document.getElementById("editId").value = item.id;
+                document.getElementById("editNip").value = item.nip;
+                document.getElementById("editNik").value = item.nik;
+                document.getElementById("editNama").value = item.nama;
+                document.getElementById("editJabatan").value = item.jabatan;
+                document.getElementById("editStatus").value = item.status_asn;
+                document.getElementById("editGolongan").value = item.golongan;
+                generatePtkpOptions("editPtkp", item.status_ptkp);
+                document.getElementById("editAlamat").value = item.alamat;
+                $('#modalEdit').modal('show');
+            });
+    }
+
+    window.updatePegawai = function() {
+        const id = document.getElementById("editId").value;
+        const data = {
+            nip: document.getElementById("editNip").value,
+            nik: document.getElementById("editNik").value,
+            nama: document.getElementById("editNama").value,
+            jabatan: document.getElementById("editJabatan").value,
+            status_asn: parseInt(document.getElementById("editStatus").value),
+            golongan: document.getElementById("editGolongan").value,
+            status_ptkp: document.getElementById("editPtkp").value,
+            alamat: document.getElementById("editAlamat").value
+        };
+        fetch(`${API_BASE_URL}/pegawai/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${Auth.getToken()}` },
+            body: JSON.stringify(data)
+        }).then(() => { $('#modalEdit').modal('hide'); loadData(); });
+    }
+
+    window.deletePegawai = function(id) {
+        if (confirm("Yakin hapus data ini?")) {
+            fetch(`${API_BASE_URL}/pegawai/${id}`, { 
+                method: "DELETE",
+                headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+            }).then(() => loadData());
+        }
+    }
+
+    function generatePtkpOptions(elementId, selectedValue) {
+        const select = document.getElementById(elementId);
+        select.innerHTML = "";
+        ptkpList.forEach(ptkp => {
+            const option = document.createElement("option");
+            option.value = ptkp; option.textContent = ptkp;
+            if (selectedValue === ptkp) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+
+    window.changePage = function(page) { currentPage = page; displayTable(); setupPagination(); }
+    function setupPagination() {
+        let pageCount = Math.ceil(filteredData.length / rowsPerPage);
+        let pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        for (let i = 1; i <= pageCount; i++) {
+            pagination.innerHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+    }
+
+    loadData();
+})();
+</script>
