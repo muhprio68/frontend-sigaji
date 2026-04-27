@@ -457,6 +457,25 @@
     }
 
    window.showTpp = function (id) {
+        const modalBody = document.querySelector('#modalDetailTpp .modal-body');
+
+        // 1. Sembunyikan konten asli (slip TPP) sementara
+        Array.from(modalBody.children).forEach(child => {
+            if (child.id !== 'spinnerTpp') child.style.display = 'none';
+        });
+
+        // 2. Bikin dan tampilkan spinner animasi guede
+        let spinner = document.getElementById('spinnerTpp');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerTpp" class="text-center py-5 d-print-none"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-4"></i><br><h5 class="text-muted font-weight-bold">Menyiapkan Slip TPP...</h5><p class="small text-muted">Mengambil rincian dari server</p></div>');
+            spinner = document.getElementById('spinnerTpp');
+        }
+        spinner.style.display = 'block';
+
+        // 3. MUNCULIN MODALNYA DULUAN! Biar user liat loadingnya
+        $("#modalDetailTpp").modal("show");
+
+        // 4. Mulai tarik data
         fetch(`${API_BASE_URL}/tpp/${id}`, {
             method: 'GET',
             headers: {
@@ -474,13 +493,13 @@
         .then((item) => {
             const dataItem = item.data ? item.data : item;
 
-            // NIP & Nama
+            // --- NIP & Nama ---
             const nip = dataItem.nip || (dataItem.Pegawai ? dataItem.Pegawai.nip : "-");
             const nama = dataItem.nama || (dataItem.Pegawai ? dataItem.Pegawai.nama : "-");
             document.getElementById("tpp_dNip").innerText = nip;
             document.getElementById("tpp_dNama").innerText = nama;
 
-            // Periode
+            // --- Periode ---
             let strTipe = (dataItem.jenis_penghasilan || "Bulanan").toUpperCase();
             let namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const bulanIdx = parseInt(dataItem.bulan) || 0;
@@ -488,18 +507,18 @@
             const tahunStr = dataItem.tahun || "";
             document.getElementById("tpp_dPeriode").innerText = "TPP " + strTipe + " " + namaBulanStr + " " + tahunStr;
 
-            // Logika Hide/Show (ID ini juga harus diganti di HTML ya)
+            // --- Logika Hide/Show Elemen PPPK ---
             const rowTunjPph = document.getElementById("tpp_rowTunjPph");
-            const labelInOut = document.getElementById("tpp_labelInOut");
+            const labelInOut = document.getElementById("labelInOut"); // Udah gua benerin ID-nya
             if (jenis === 2) { // 2 = PPPK
                 if(rowTunjPph) rowTunjPph.style.display = "none";
                 if(labelInOut) labelInOut.style.display = "none";
             } else {
-                if(rowTunjPph) rowTunjPph.style.display = "flex";
+                if(rowTunjPph) rowTunjPph.style.display = "flex"; // Pakai flex karena aslinya d-flex
                 if(labelInOut) labelInOut.style.display = "block";
             }
 
-            // Penerimaan
+            // --- Penerimaan ---
             document.getElementById("tpp_dBeban").innerText = formatRupiah(dataItem.beban_kerja || 0);
             document.getElementById("tpp_dPrestasi").innerText = formatRupiah(dataItem.prestasi_kerja || 0);
             document.getElementById("tpp_dKondisi").innerText = formatRupiah(dataItem.kondisi_kerja || 0);
@@ -507,12 +526,12 @@
             document.getElementById("tpp_dTunjpph").innerText = formatRupiah(dataItem.tunj_pph21 || 0);
             document.getElementById("tpp_dBruto").innerText = formatRupiah(dataItem.bruto_tpp || 0);
             
-            // Potongan
+            // --- Potongan ---
             document.getElementById("tpp_dPotbpjs1").innerText = formatRupiah(dataItem.pot_bpjs1 || 0);
             document.getElementById("tpp_dPotpph").innerText = formatRupiah(dataItem.pot_pph21 || 0);
             document.getElementById("tpp_dPotbpjs4").innerText = formatRupiah(dataItem.pot_bpjs4 || 0);
 
-            // Hitung Total Potongan & Bersih
+            // --- Hitung Total Potongan & Bersih ---
             let potBpjs1 = parseFloat(dataItem.pot_bpjs1) || 0;
             let potPph21 = parseFloat(dataItem.pot_pph21) || 0;
             let potBpjs4 = parseFloat(dataItem.pot_bpjs4) || 0;
@@ -522,11 +541,19 @@
             document.getElementById("tpp_dTotalPotongan").innerText = formatRupiah(totalPot || 0);
             document.getElementById("tpp_dBersih").innerText = formatRupiah(dataItem.tpp_bersih || 0);
 
-            $("#modalDetailTpp").modal("show");
+            // 5. DATA SIAP! Hilangkan spinner, tampilkan slip TPP-nya dengan mulus
+            spinner.style.display = 'none';
+            Array.from(modalBody.children).forEach(child => {
+                if (child.id !== 'spinnerTpp') child.style.display = '';
+            });
         })
         .catch((err) => {
             console.error("Gagal ambil detail:", err);
-            alert("Gagal mengambil detail TPP. Pastikan token masih aktif.");
+            // Kalau gagal, ganti spinner jadi pesan error
+            let spinner = document.getElementById('spinnerTpp');
+            if(spinner) {
+                spinner.innerHTML = '<div class="alert alert-danger m-4"><i class="fas fa-exclamation-triangle mb-2 fa-2x"></i><br>Gagal mengambil rincian TPP dari server. Pastikan token aktif.</div>';
+            }
         });
     };
 

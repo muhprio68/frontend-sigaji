@@ -488,6 +488,25 @@
     };
 
    window.showGaji = function (id) {
+        const modalBody = document.querySelector('#modalDetailGaji .modal-body');
+        
+        // 1. Sembunyikan konten asli (slip gaji) sementara
+        Array.from(modalBody.children).forEach(child => {
+            if (child.id !== 'spinnerGaji') child.style.display = 'none';
+        });
+
+        // 2. Bikin dan tampilkan spinner animasi guede
+        let spinner = document.getElementById('spinnerGaji');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerGaji" class="text-center py-5 d-print-none"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-4"></i><br><h5 class="text-muted font-weight-bold">Menyiapkan Slip Gaji...</h5><p class="small text-muted">Mengambil rincian dari server</p></div>');
+            spinner = document.getElementById('spinnerGaji');
+        }
+        spinner.style.display = 'block';
+
+        // 3. MUNCULIN MODALNYA DULUAN! Biar user liat loadingnya
+        $("#modalDetailGaji").modal("show");
+
+        // 4. Mulai tarik data
         fetch(`${API_BASE_URL}/gajipokok/${id}`, {
             method: 'GET',
             headers: {
@@ -505,13 +524,13 @@
         .then((resData) => {
             const item = resData.data ? resData.data : resData;
 
-            // NIP & Nama
+            // --- NIP & Nama ---
             const nip = item.nip || (item.Pegawai ? item.Pegawai.nip : "-");
             const nama = item.nama || (item.Pegawai ? item.Pegawai.nama : "-");
             document.getElementById("gaji_dNip").innerText = nip;
             document.getElementById("gaji_dNama").innerText = nama;
             
-            // Periode
+            // --- Periode ---
             let strTipe = (item.jenis_penghasilan || "Bulanan").toUpperCase();
             let namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const bulanIdx = parseInt(item.bulan) || 0;
@@ -519,7 +538,7 @@
             const tahunStr = item.tahun || "";
             document.getElementById("gaji_dPeriode").innerText = "GAJI " + strTipe + " " + namaBulanStr + " " + tahunStr;
 
-            // Rincian Penerimaan
+            // --- Rincian Penerimaan ---
             document.getElementById("gaji_dGajiPokok").innerText = formatRupiah(item.gaji_pokok || 0);
             document.getElementById("gaji_dTunjSI").innerText = formatRupiah(item.tunj_suami_istri || 0);
             document.getElementById("gaji_dTunjAnak").innerText = formatRupiah(item.tunj_anak || 0);
@@ -534,7 +553,7 @@
             document.getElementById("gaji_dJkmPemda").innerText = formatRupiah(item.jkm_pemda || 0);
             document.getElementById("gaji_dBruto").innerText = formatRupiah(item.bruto_gaji || 0);
 
-            // Rincian Potongan
+            // --- Rincian Potongan ---
             document.getElementById("gaji_dIwp8").innerText = formatRupiah(item.iwp_8_persen || 0);
             document.getElementById("gaji_dIwp1").innerText = formatRupiah(item.iwp_1_persen || 0);
             document.getElementById("gaji_dTapera").innerText = formatRupiah(item.potongan_tapera || 0);
@@ -544,7 +563,7 @@
             document.getElementById("gaji_dPotJkkPemda").innerText = formatRupiah(item.jkk_pemda || 0);
             document.getElementById("gaji_dPotJkmPemda").innerText = formatRupiah(item.jkm_pemda || 0);
             
-            // Hitung Total Potongan & Bersih
+            // --- Hitung Total Potongan & Bersih ---
             let hitungPotongan = (parseFloat(item.iwp_8_persen) || 0) + (parseFloat(item.iwp_1_persen) || 0) + 
                                  (parseFloat(item.potongan_tapera) || 0) + (parseFloat(item.potongan_lain) || 0) + 
                                  (parseFloat(item.tunj_pph) || 0) + (parseFloat(item.bpjs_kes_pemda) || 0) + 
@@ -555,11 +574,19 @@
             document.getElementById("gaji_dTotalPotongan").innerText = formatRupiah(totalPot || 0);
             document.getElementById("gaji_dBersih").innerText = formatRupiah(item.gaji_bersih || 0);
 
-            $("#modalDetailGaji").modal("show");
+            // 5. DATA SIAP! Hilangkan spinner, tampilkan slip gajinya secara elegan
+            spinner.style.display = 'none';
+            Array.from(modalBody.children).forEach(child => {
+                if (child.id !== 'spinnerGaji') child.style.display = '';
+            });
         })
         .catch((err) => {
             console.error("Gagal ambil detail:", err);
-            alert("Gagal mengambil rincian detail slip gaji. Pastikan token masih aktif.");
+            // Kalau gagal, ganti spinner jadi pesan error
+            let spinner = document.getElementById('spinnerGaji');
+            if(spinner) {
+                spinner.innerHTML = '<div class="alert alert-danger m-4"><i class="fas fa-exclamation-triangle mb-2 fa-2x"></i><br>Gagal mengambil rincian gaji dari server.</div>';
+            }
         });
     };
 

@@ -365,29 +365,57 @@
     
     window.changePage = function (page) { currentPage = page; displayTable(); setupPagination(); };
 
+    // ==========================================
+    // 1. ANIMASI MODAL DETAIL A1
+    // ==========================================
     window.showDetail = function (itemStr) {
-        let item = JSON.parse(itemStr);
-        document.getElementById("a1_dNik").innerText = item.nik;
-        document.getElementById("a1_dNama").innerText = item.nama.trim();
-        document.getElementById("a1_dJabatan").innerText = item.jabatan;
-        document.getElementById("a1_dPtkp").innerText = item.status_ptkp;
-        document.getElementById("a1_dMasa").innerText = item.bulan_awal + " s.d " + item.bulan_akhir;
+        const modalBody = document.querySelector('#modalDetailA1 .modal-body');
 
-        document.getElementById("a1_dSalary").innerText = formatRupiah(item.salary_pension_jht_tht);
-        document.getElementById("a1_dTaxBenefit").innerText = formatRupiah(item.income_tax_benefit);
-        document.getElementById("a1_dInsurance").innerText = formatRupiah(item.insurance_paid_by_emp);
-        document.getElementById("a1_dOther").innerText = formatRupiah(item.other_benefit);
-        document.getElementById("a1_dThr").innerText = formatRupiah(item.tantiem_bonus_thr);
-        document.getElementById("a1_dBruto").innerText = formatRupiah(item.total_bruto);
+        // Sembunyikan konten asli sementara
+        Array.from(modalBody.children).forEach(child => {
+            if (child.id !== 'spinnerA1') child.style.display = 'none';
+        });
 
-        document.getElementById("a1_dBiayaJabatan").innerText = formatRupiah(item.biaya_jabatan);
-        document.getElementById("a1_dPension").innerText = formatRupiah(item.pension_contribution);
-        document.getElementById("a1_dTotalPengurangan").innerText = formatRupiah(item.biaya_jabatan + item.pension_contribution);
+        // Bikin & Tampilkan Spinner
+        let spinner = document.getElementById('spinnerA1');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerA1" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><br><h6 class="text-muted font-weight-bold">Memuat Rincian Form 1721-A1...</h6></div>');
+            spinner = document.getElementById('spinnerA1');
+        }
+        spinner.style.display = 'block';
 
-        document.getElementById("a1_dNeto").innerText = formatRupiah(item.total_neto);
-        document.getElementById("a1_dPphSetahun").innerText = formatRupiah(item.pph21_setahun);
-
+        // Munculkan Modal duluan
         $("#modalDetailA1").modal("show");
+
+        // Simulasi loading 0.5 detik
+        setTimeout(() => {
+            let item = JSON.parse(itemStr);
+            document.getElementById("a1_dNik").innerText = item.nik;
+            document.getElementById("a1_dNama").innerText = item.nama.trim();
+            document.getElementById("a1_dJabatan").innerText = item.jabatan;
+            document.getElementById("a1_dPtkp").innerText = item.status_ptkp;
+            document.getElementById("a1_dMasa").innerText = item.bulan_awal + " s.d " + item.bulan_akhir;
+
+            document.getElementById("a1_dSalary").innerText = formatRupiah(item.salary_pension_jht_tht);
+            document.getElementById("a1_dTaxBenefit").innerText = formatRupiah(item.income_tax_benefit);
+            document.getElementById("a1_dInsurance").innerText = formatRupiah(item.insurance_paid_by_emp);
+            document.getElementById("a1_dOther").innerText = formatRupiah(item.other_benefit);
+            document.getElementById("a1_dThr").innerText = formatRupiah(item.tantiem_bonus_thr);
+            document.getElementById("a1_dBruto").innerText = formatRupiah(item.total_bruto);
+
+            document.getElementById("a1_dBiayaJabatan").innerText = formatRupiah(item.biaya_jabatan);
+            document.getElementById("a1_dPension").innerText = formatRupiah(item.pension_contribution);
+            document.getElementById("a1_dTotalPengurangan").innerText = formatRupiah(item.biaya_jabatan + item.pension_contribution);
+
+            document.getElementById("a1_dNeto").innerText = formatRupiah(item.total_neto);
+            document.getElementById("a1_dPphSetahun").innerText = formatRupiah(item.pph21_setahun);
+
+            // Hilangkan spinner, tampilkan konten
+            spinner.style.display = 'none';
+            Array.from(modalBody.children).forEach(child => {
+                if (child.id !== 'spinnerA1') child.style.display = '';
+            });
+        }, 500); // 500ms delay
     };
 
     // 🔥 FUNGSI MODAL MASAL 🔥
@@ -399,42 +427,48 @@
     };
 
    // 🔥 FUNGSI MODAL MASSAL 🔥
+    // ==========================================
+    // 2. ANIMASI DOWNLOAD XML MASSAL
+    // ==========================================
     const btnDownloadXMLMasal = document.getElementById("btnDownloadXMLMasal");
     if(btnDownloadXMLMasal){
-        btnDownloadXMLMasal.addEventListener("click", function() {
+        btnDownloadXMLMasal.onclick = async function() {
             let tahun = tahunSelect.value;
             let tglPotong = document.getElementById("inputTglPotongMasal").value;
 
             if (!tglPotong) {
-                alert("Tanggal Potong wajib diisi!");
-                document.getElementById("inputTglPotongMasal").focus();
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal Potong wajib diisi!' });
                 return;
             }
 
-            // 1. Susun URL Tanpa Token
             let downloadUrl = `${API_BASE_URL}/pph21/tahunan-export-a1?tahun=${tahun}&tgl_potong=${tglPotong}`;
 
-            // 2. Efek Loading
-            let originalText = btnDownloadXMLMasal.innerHTML;
-            btnDownloadXMLMasal.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
-            btnDownloadXMLMasal.disabled = true;
+            // Tutup Modal Bootstrap Duluan
+            $('#modalGenerateMasal').modal('hide');
 
-            // 3. Fetch as Blob
-            fetch(downloadUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${Auth.getToken()}` // Token aman di Header
+            // Munculin Loading SweetAlert
+            Swal.fire({
+                title: 'Membuat Bulk XML...',
+                text: 'Mohon tunggu, meracik ratusan data A1 untuk Coretax.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const response = await fetch(downloadUrl, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) { Swal.close(); Auth.logout(); return; }
+                    let errorMsg = "Gagal men-generate file XML Massal.";
+                    try { const errData = await response.json(); if (errData.message) errorMsg = errData.message; } catch(e) { }
+                    throw new Error(errorMsg);
                 }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    if (res.status === 401) Auth.logout();
-                    throw new Error("Gagal generate XML Masal");
-                }
-                return res.blob();
-            })
-            .then(blob => {
-                // 4. Proses Download Gaib
+
+                const blob = await response.blob();
                 const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -445,22 +479,19 @@
                 a.remove();
                 window.URL.revokeObjectURL(urlBlob);
 
-                // 5. Bersih-bersih
-                btnDownloadXMLMasal.innerHTML = originalText;
-                btnDownloadXMLMasal.disabled = false;
-                $('#modalGenerateMasal').modal('hide');
+                // Tampilkan sukses!
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Bulk XML A1 berhasil diunduh.', timer: 2500, showConfirmButton: false });
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gagal Unduh', text: error.message });
+            } finally {
+                // Bersihkan background modal abu-abu
                 setTimeout(() => {
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open').css('padding-right', '');
                 }, 300);
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Gagal mengunduh file XML Massal. Pastikan token aktif.");
-                btnDownloadXMLMasal.innerHTML = originalText;
-                btnDownloadXMLMasal.disabled = false;
-            });
-        });
+            }
+        };
     }
 
     // 🔥 FUNGSI MODAL INDIVIDU 🔥
@@ -472,44 +503,50 @@
         $('#modalGeneratePerOrang').modal('show');
     };
 
+    // ==========================================
+    // 3. ANIMASI DOWNLOAD XML INDIVIDU
+    // ==========================================
     const btnDownloadXMLPerOrang = document.getElementById("btnDownloadXMLPerOrang");
     if(btnDownloadXMLPerOrang){
-        btnDownloadXMLPerOrang.addEventListener("click", function() {
+        btnDownloadXMLPerOrang.onclick = async function() {
             let id = document.getElementById("modalGenId").value;
             let tahun = tahunSelect.value;
             let tglPotong = document.getElementById("inputTglPotongPerOrang").value;
-            let namaPegawai = document.getElementById("modalGenNama").innerText.replace(/[^a-zA-Z0-9]/g, "_"); // Bersihin nama buat nama file
+            let namaPegawai = document.getElementById("modalGenNama").innerText.replace(/[^a-zA-Z0-9]/g, "_"); 
 
             if (!tglPotong) {
-                alert("Tanggal Potong wajib diisi!");
-                document.getElementById("inputTglPotongPerOrang").focus();
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal Potong wajib diisi!' });
                 return;
             }
 
-            // 1. Susun URL Tanpa Token
             let downloadUrl = `${API_BASE_URL}/pph21/tahunan-export-a1?tahun=${tahun}&id=${id}&tgl_potong=${tglPotong}`;
 
-            // 2. Efek Loading
-            let originalText = btnDownloadXMLPerOrang.innerHTML;
-            btnDownloadXMLPerOrang.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
-            btnDownloadXMLPerOrang.disabled = true;
+            // Tutup Modal Bootstrap Duluan
+            $('#modalGeneratePerOrang').modal('hide');
 
-            // 3. Fetch as Blob
-            fetch(downloadUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${Auth.getToken()}`
+            // Munculin Loading SweetAlert
+            Swal.fire({
+                title: 'Membuat XML A1...',
+                text: `Meracik data untuk ${document.getElementById("modalGenNama").innerText}.`,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const response = await fetch(downloadUrl, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) { Swal.close(); Auth.logout(); return; }
+                    let errorMsg = "Gagal men-generate file XML Individu.";
+                    try { const errData = await response.json(); if (errData.message) errorMsg = errData.message; } catch(e) { }
+                    throw new Error(errorMsg);
                 }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    if (res.status === 401) Auth.logout();
-                    throw new Error("Gagal generate XML Per Orang");
-                }
-                return res.blob();
-            })
-            .then(blob => {
-                // 4. Proses Download Gaib
+
+                const blob = await response.blob();
                 const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -520,22 +557,18 @@
                 a.remove();
                 window.URL.revokeObjectURL(urlBlob);
 
-                // 5. Bersih-bersih
-                btnDownloadXMLPerOrang.innerHTML = originalText;
-                btnDownloadXMLPerOrang.disabled = false;
-                $('#modalGeneratePerOrang').modal('hide');
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'XML A1 berhasil diunduh.', timer: 2500, showConfirmButton: false });
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gagal Unduh', text: error.message });
+            } finally {
+                // Bersihkan background modal abu-abu
                 setTimeout(() => {
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open').css('padding-right', '');
                 }, 300);
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Gagal mengunduh file XML. Pastikan token aktif.");
-                btnDownloadXMLPerOrang.innerHTML = originalText;
-                btnDownloadXMLPerOrang.disabled = false;
-            });
-        });
+            }
+        };
     }
 
     loadData();

@@ -92,8 +92,7 @@
             </div>
 
             <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-sm btn-warning font-weight-bold shadow-sm" data-toggle="modal" data-target="#modalGenerateXML" style="color: #000;">
-              <i class="fas fa-file-code mr-1"></i>
+            <button class="btn btn-sm btn-warning font-weight-bold shadow-sm" data-toggle="modal" data-target="#modalGenerateXML" style="color: #000;" onclick="this.blur()">              <i class="fas fa-file-code mr-1"></i>
               <span id="labelBtnXML">Generate XML BPMP Coretax</span>
             </button></div>
 
@@ -369,108 +368,165 @@
         }
     }
 
-   const btnDownloadXML = document.getElementById("btnDownloadXML");
+    // ==========================================
+    // 1. UPDATE TOMBOL DOWNLOAD XML (ANTI NYANGKUT)
+    // ==========================================
+    const btnDownloadXML = document.getElementById("btnDownloadXML");
     const inputTglPotongModal = document.getElementById("inputTglPotongModal");
     if(inputTglPotongModal) inputTglPotongModal.value = new Date().toISOString().split('T')[0];
 
     if(btnDownloadXML) {
-        btnDownloadXML.addEventListener("click", function () {
+        // Pake onclick biar event-nya gak numpuk/dobel pas pindah menu
+        btnDownloadXML.onclick = async function () {
             let tipe = tipeSelect.value;
             let bulan = bulanSelect.value;
             let tahun = tahunSelect.value;
             let tglPotong = inputTglPotongModal.value;
 
             if (!tglPotong) {
-                alert("Tanggal Potong wajib diisi!");
-                inputTglPotongModal.focus();
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal Potong wajib diisi!' });
                 return;
             }
 
-            // 1. Susun URL (TANPA nyelipin token di URL)
+            // 1. Susun URL
             let downloadUrl = `${API_BASE_URL}/pph21/export-xmlbulan?tahun=${tahun}&tgl_potong=${tglPotong}`;
             if (jenis !== 0) downloadUrl += `&jenis=${jenis}`;
             if (tipe !== "") downloadUrl += `&tipe=${tipe}`;
             if (tipe === "" || tipe === "bulanan") downloadUrl += `&bulan=${bulan}`;
 
-            // 2. Ubah tombol jadi status loading
-            let originalText = btnDownloadXML.innerHTML;
-            btnDownloadXML.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
-            btnDownloadXML.disabled = true;
+            // 2. TUTUP MODAL BOOTSTRAP DULUAN BIAR GAK TABRAKAN!
+            $('#modalGenerateXML').modal('hide');
 
-            // 3. Tembak API pakai Fetch & Header Authorization
-            fetch(downloadUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${Auth.getToken()}` // Karcis satpam wajib di Header
+            // 3. Munculkan SweetAlert Loading
+            Swal.fire({
+                title: 'Membuat File XML...',
+                text: 'Mohon tunggu, meracik data untuk BPMP Coretax.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    if (res.status === 401) Auth.logout(); // Tendang kalau token mati
-                    throw new Error("Gagal generate XML");
+            });
+
+            // 4. Eksekusi API pake Try-Catch (Biar kalau error ketangkep)
+            try {
+                const response = await fetch(downloadUrl, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+
+                // Kalau respon dari backend Golang GAGAL (bukan 200 OK)
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        Swal.close();
+                        Auth.logout();
+                        return;
+                    }
+                    
+                    // Coba tangkap pesan error asli dari Golang
+                    let errorMsg = "Gagal men-generate file XML dari server.";
+                    try {
+                        const errData = await response.json();
+                        if (errData.message) errorMsg = errData.message;
+                    } catch(e) { } // Abaikan kalau bukan JSON
+                    
+                    throw new Error(errorMsg); // Lempar error ke blok catch di bawah
                 }
-                return res.blob(); // Ubah response jadi file
-            })
-            .then(blob => {
-                // 4. Bikin link download palsu/gaib di background
+
+                // Kalau SUKSES, ubah respon jadi file
+                const blob = await response.blob();
+                
+                // Bikin link download gaib
                 const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = urlBlob;
                 
-                // Dinamis nama file
                 let strBulan = (tipe === "" || tipe === "bulanan") ? `Bulan_${bulan}` : tipe.toUpperCase();
                 a.download = `Coretax_PPH21_${strBulan}_${tahun}.xml`; 
                 
                 document.body.appendChild(a);
-                a.click(); // Paksa browser klik download
+                a.click(); // Paksa browser download
                 
-                // 5. Bersih-bersih memori & UI
+                // Bersihin memori
                 a.remove();
                 window.URL.revokeObjectURL(urlBlob); 
 
-                btnDownloadXML.innerHTML = originalText;
-                btnDownloadXML.disabled = false;
+                // Tampilkan sukses (Otomatis numpuk/nutup loading yang tadi)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'File XML berhasil diunduh dan siap di-import.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
 
-                // Tutup Modal & hapus backdrop abu-abu SPA
-                $('#modalGenerateXML').modal('hide');
+            } catch (error) {
+                console.error("Error Download:", error);
+                
+                // Munculin pesan error biar gak muter-muter doang
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Unduh',
+                    text: error.message
+                });
+            } finally {
+                // Pastikan sisa abu-abu dari modal (backdrop) hilang 100%
                 setTimeout(() => {
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open').css('padding-right', '');
                 }, 300);
-            })
-            .catch(err => {
-                console.error("Error Download:", err);
-                alert("Gagal mengunduh file XML. Pastikan token aktif dan data tersedia.");
-                
-                // Balikin tombol kalau error
-                btnDownloadXML.innerHTML = originalText;
-                btnDownloadXML.disabled = false;
-            });
-        });
+            }
+        };
     }
-
+    // ==========================================
+    // 2. UPDATE DETAIL PEGAWAI (ANIMASI ELEGAN)
+    // ==========================================
     window.showDetailModal = function(index) {
-        let item = allData[index];
-        let tipeTxt = tipeSelect.options[tipeSelect.selectedIndex].text;
-        
-        document.getElementById("bul_detNama").innerText = item.nama;
-        document.getElementById("bul_detNIP").innerText = item.nip;
-        document.getElementById("bul_detNIK").innerText = item.nik || '-';
-        document.getElementById("bul_detJenis").innerText = "PPh 21 " + tipeTxt;
-        document.getElementById("bul_detJabatan").innerText = item.jabatan || '-';
-        document.getElementById("bul_detPTKP").innerText = item.status_ptkp || '-';
-        
-        document.getElementById("bul_detBrutoGaji").innerText = formatRupiah(item.bruto_gaji);
-        document.getElementById("bul_detBrutoTPP").innerText = formatRupiah(item.bruto_tpp);
-        document.getElementById("bul_detTotalBruto").innerText = formatRupiah(item.total_bruto);
-        
-        let ratePersen = item.tarif_ter ? (item.tarif_ter * 100) : 0;
-        document.getElementById("bul_detTarif").innerText = ratePersen.toFixed(2).replace(/\.00$/, '') + " %";
-        
-        document.getElementById("bul_detPPh21").innerText = formatRupiah(item.pph21);
+        const modalBody = document.querySelector('#modalDetailPegawai .modal-body');
+        const table = modalBody.querySelector('table');
 
+        // 1. Sembunyikan tabel sementara
+        if(table) table.style.display = 'none';
+
+        // 2. Bikin & Tampilkan Spinner di tengah
+        let spinner = document.getElementById('spinnerDetailPph');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerDetailPph" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-info mb-3"></i><br><h6 class="text-muted font-weight-bold">Memuat Detail PPh 21...</h6></div>');
+            spinner = document.getElementById('spinnerDetailPph');
+        }
+        spinner.style.display = 'block';
+
+        // 3. Munculkan Modal duluan
         $('#modalDetailPegawai').modal('show');
+
+        // 4. Simulasi waktu server (0.5 detik) biar animasinya kerasa
+        setTimeout(() => {
+            let item = allData[index];
+            let tipeTxt = tipeSelect.options[tipeSelect.selectedIndex].text;
+            
+            document.getElementById("bul_detNama").innerText = item.nama;
+            document.getElementById("bul_detNIP").innerText = item.nip;
+            document.getElementById("bul_detNIK").innerText = item.nik || '-';
+            document.getElementById("bul_detJenis").innerText = "PPh 21 " + tipeTxt;
+            document.getElementById("bul_detJabatan").innerText = item.jabatan || '-';
+            document.getElementById("bul_detPTKP").innerText = item.status_ptkp || '-';
+            
+            document.getElementById("bul_detBrutoGaji").innerText = formatRupiah(item.bruto_gaji);
+            document.getElementById("bul_detBrutoTPP").innerText = formatRupiah(item.bruto_tpp);
+            document.getElementById("bul_detTotalBruto").innerText = formatRupiah(item.total_bruto);
+            
+            // Format TER (Aman, gak diotak-atik biar masuk Coretax)
+            let ratePersen = item.tarif_ter ? (item.tarif_ter * 100) : 0;
+            document.getElementById("bul_detTarif").innerText = ratePersen.toFixed(2).replace(/\.00$/, '') + " %";
+            
+            document.getElementById("bul_detPPh21").innerText = formatRupiah(item.pph21);
+
+            // 5. Data Siap! Hilangkan spinner, tampilkan tabel
+            spinner.style.display = 'none';
+            if(table) table.style.display = '';
+
+        }, 500); // 500ms = 0.5 detik
     };
 
     window.changePage = function(event, page) {

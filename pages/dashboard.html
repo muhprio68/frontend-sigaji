@@ -249,9 +249,22 @@
 
         infoPeriode.innerText = `${textBulan} ${tahun}`;
         
-        loader.style.display = 'block';
-        tableBody.innerHTML = '';
+        // Sembunyikan loader bawaan karena kita pake SweetAlert
+        loader.style.display = 'none';
+        
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data LRA...</td></tr>`;
         summaryCards.style.opacity = '0.5';
+
+        // Munculin Loading SweetAlert
+        Swal.fire({
+            title: 'Memuat Dashboard...',
+            text: 'Sedang menghitung rekapitulasi Realisasi Anggaran.',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         // 🔥 Tembak API Pake Karcis Satpam (JWT Token) 🔥
         fetch(`${API_BASE_URL}/realisasi?tahun=${tahun}&bulan=${bulan}`, {
@@ -377,14 +390,22 @@
 
             // Render HTML Tabel
             tableBody.innerHTML = html;
-            loader.style.display = 'none';
             summaryCards.style.opacity = '1';
+
+            // TUTUP LOADING SWEETALERT
+            Swal.close();
         })
         .catch(err => {
             console.error("Fetch Error:", err);
             tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data API. Pastikan server Golang sedang berjalan.</td></tr>`;
-            loader.style.display = 'none';
             summaryCards.style.opacity = '1';
+            
+            // Tutup loading dan ganti dengan error
+            Swal.fire({
+                icon: 'error',
+                title: 'Koneksi Terputus',
+                text: 'Gagal menghubungi server untuk mengambil data Dashboard.'
+            });
         });
     }
 
@@ -395,23 +416,60 @@
     // Load pertama kali
     loadData();
 
-    // 🔥 FUNGSI EXPORT EXCEL 🔥
+    // 🔥 FUNGSI EXPORT EXCEL DENGAN LOADING 🔥
     const btnExport = document.getElementById('btnExportExcel');
     if (btnExport) {
         btnExport.addEventListener('click', function () {
-            // Pastikan library XLSX sudah keload sebelum dipanggil
+            // 1. Cek Library
             if (typeof XLSX === 'undefined') {
-                alert("Library Excel sedang dimuat, coba lagi dalam beberapa detik.");
+                Swal.fire({ icon: 'error', title: 'Library Missing', text: 'Library Excel gagal dimuat.' });
                 return;
             }
-            
-            const tabel = document.getElementById('tableLRA');
+
             const bulan = filterBulan.options[filterBulan.selectedIndex].text;
             const tahun = filterTahun.value;
-
-            const wb = XLSX.utils.table_to_book(tabel, { sheet: "LRA" });
             const fileName = `LRA_Gaji_TPP_${bulan}_${tahun}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+
+            // 2. Munculkan Loading
+            Swal.fire({
+                title: 'Menyiapkan Excel...',
+                text: 'Sedang mengonversi data tabel ke format .xlsx',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // 3. Pake setTimeout dikit biar browser sempet ngerender pop-up loading
+            // sebelum dia sibuk ngeproses tabel yang berat
+            setTimeout(() => {
+                try {
+                    const tabel = document.getElementById('tableLRA');
+                    
+                    // Proses konversi
+                    const wb = XLSX.utils.table_to_book(tabel, { sheet: "LRA Realisasi" });
+                    
+                    // Download file
+                    XLSX.writeFile(wb, fileName);
+
+                    // 4. Sukses!
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Laporan Realisasi telah diunduh.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Export',
+                        text: 'Terjadi kesalahan saat memproses file Excel.'
+                    });
+                }
+            }, 500); // Kasih nafas 0.5 detik
         });
     }
 })();

@@ -17,7 +17,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
                         </div>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama atau NIP..." oninput="searchPegawai()">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama, NIP atau NIK..." oninput="searchPegawai()">
                     </div>
                 </div>
             </div>
@@ -131,7 +131,7 @@
 <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-warning">
+            <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title">Edit Pegawai</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
@@ -175,29 +175,49 @@
     const ptkpList = ["TK/0","TK/1","TK/2","TK/3","K/0","K/1","K/2","K/3"];
 
     function loadData() {
-        let url = `${API_BASE_URL}/pegawai`;
-        if (jenis && statusMap[jenis.toLowerCase()]) {
-            url += "?jenis=" + statusMap[jenis.toLowerCase()];
-        }
-
-        fetch(url, {
-            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            allData = Array.isArray(data) ? data : (data.data || []);
-            filteredData = [...allData];
-            document.getElementById("totalPegawai").innerText = allData.length;
-            displayTable();
-            setupPagination();
-        });
+    let url = `${API_BASE_URL}/pegawai`;
+    if (jenis && statusMap[jenis.toLowerCase()]) {
+        url += "?jenis=" + statusMap[jenis.toLowerCase()];
     }
+
+    // 🔥 1. TANGKEP DULU ELEMEN TBODY-NYA (Sesuaikan ID-nya dengan yang ada di HTML lu)
+    // Kalau tbody di HTML lu punya ID "tbodyPegawai", pakai yang atas.
+    // Kalau nggak ada ID-nya, pakai yang bawah.
+    
+    const tbody = document.getElementById("tbodyPegawai") || document.querySelector("table tbody");
+
+    // 🔥 2. BARU SUNTIK ANIMASI
+    if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
+    }
+
+    fetch(url, {
+        headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+        allData = Array.isArray(data) ? data : (data.data || []);
+        filteredData = [...allData];
+        document.getElementById("totalPegawai").innerText = allData.length;
+        
+        // Animasi loading tadi bakal ketimpa otomatis sama fungsi lu di bawah ini
+        displayTable();
+        setupPagination();
+    })
+    .catch(err => {
+        // Jaga-jaga kalau error, animasinya diganti pesan error
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data pegawai.</td></tr>`;
+        }
+    });
+}
 
     window.searchPegawai = function() {
         const keyword = document.getElementById("searchInput").value.toLowerCase();
         filteredData = allData.filter(item => 
             item.nama.toLowerCase().includes(keyword) || 
-            item.nip.includes(keyword)
+            item.nip.includes(keyword) ||
+            item.nik.includes(keyword)
         );
         currentPage = 1;
         displayTable();
@@ -212,7 +232,7 @@
 
         paginatedItems.forEach((item, index) => {
             let statusLabel = item.status_asn == 1 ? '<span class="badge badge-success">PNS</span>' : 
-                             (item.status_asn == 2 ? '<span class="badge badge-warning">PPPK</span>' : 
+                             (item.status_asn == 2 ? '<span class="badge badge-warning text-dark">PPPK</span>' : 
                              (item.status_asn == 3 ? '<span class="badge badge-info">CPNS</span>' : 
                              '<span class="badge badge-secondary">Non ASN</span>'));
 
@@ -226,14 +246,38 @@
                     <td class="text-center">${item.status_ptkp}</td>
                     <td class="text-center">
                         <button onclick="showDetail(${item.id})" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                        <button onclick="editPegawai(${item.id})" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+                        <button onclick="editPegawai(${item.id})" class="btn btn-warning btn-sm"><i class="fas fa-edit text-dark"></i></button>
                         <button onclick="deletePegawai(${item.id})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
         });
     }
 
-    window.showDetail = function(id) {
+    window.tambahPegawai = function() {
+        document.getElementById("formTambahPegawai").reset();
+        generatePtkpOptions("tambahPtkp", null);
+        $('#modalTambah').modal('show');
+    }
+
+window.showDetail = function(id) {
+        const modalBody = document.querySelector('#modalDetail .modal-body');
+        const table = modalBody.querySelector('table');
+        
+        // Sembunyikan tabel asli dulu
+        table.style.display = 'none';
+        
+        // Bikin spinner loading besar di tengah modal
+        let spinner = document.getElementById('spinnerDetail');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerDetail" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-info mb-3"></i><br><h6 class="text-muted">Memuat data pegawai...</h6></div>');
+            spinner = document.getElementById('spinnerDetail');
+        }
+        spinner.style.display = 'block'; // Tampilkan spinner
+
+        // Munculkan modalnya sekarang (isinya cuma spinner muter)
+        $('#modalDetail').modal('show');
+
+        // Mulai tarik data
         fetch(`${API_BASE_URL}/pegawai/${id}`, { headers: { 'Authorization': `Bearer ${Auth.getToken()}` } })
             .then(res => res.json())
             .then(item => {
@@ -246,35 +290,33 @@
                 document.getElementById("detailGolongan").innerText = item.golongan;
                 document.getElementById("detailPtkp").innerText = item.status_ptkp;
                 document.getElementById("detailAlamat").innerText = item.alamat;
-                $('#modalDetail').modal('show');
+                
+                // DATA SIAP! Hilangkan spinner, tampilkan tabel
+                spinner.style.display = 'none';
+                table.style.display = 'table';
             });
     }
 
-    window.tambahPegawai = function() {
-        document.getElementById("formTambahPegawai").reset();
-        generatePtkpOptions("tambahPtkp", null);
-        $('#modalTambah').modal('show');
-    }
+window.editPegawai = function(id) {
+        const modalBody = document.querySelector('#modalEdit .modal-body');
+        
+        // Sembunyikan semua isi form (inputan, label, dll)
+        Array.from(modalBody.children).forEach(child => {
+            if (child.id !== 'spinnerEdit') child.style.display = 'none';
+        });
 
-    window.simpanPegawai = function() {
-        const data = {
-            nip: document.getElementById("tambahNip").value,
-            nik: document.getElementById("tambahNik").value,
-            nama: document.getElementById("tambahNama").value,
-            jabatan: document.getElementById("tambahJabatan").value,
-            status_asn: parseInt(document.getElementById("tambahStatus").value),
-            golongan: document.getElementById("tambahGolongan").value,
-            status_ptkp: document.getElementById("tambahPtkp").value,
-            alamat: document.getElementById("tambahAlamat").value
-        };
-        fetch(`${API_BASE_URL}/pegawai`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${Auth.getToken()}` },
-            body: JSON.stringify(data)
-        }).then(() => { $('#modalTambah').modal('hide'); loadData(); });
-    }
+        // Bikin spinner loading besar
+        let spinner = document.getElementById('spinnerEdit');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerEdit" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i><br><h6 class="text-muted">Menyiapkan form edit...</h6></div>');
+            spinner = document.getElementById('spinnerEdit');
+        }
+        spinner.style.display = 'block';
 
-    window.editPegawai = function(id) {
+        // Munculkan modal
+        $('#modalEdit').modal('show');
+
+        // Tarik data
         fetch(`${API_BASE_URL}/pegawai/${id}`, { headers: { 'Authorization': `Bearer ${Auth.getToken()}` } })
             .then(res => res.json())
             .then(item => {
@@ -287,11 +329,53 @@
                 document.getElementById("editGolongan").value = item.golongan;
                 generatePtkpOptions("editPtkp", item.status_ptkp);
                 document.getElementById("editAlamat").value = item.alamat;
-                $('#modalEdit').modal('show');
+                
+                // DATA SIAP! Hilangkan spinner, tampilkan kembali form-nya
+                spinner.style.display = 'none';
+                Array.from(modalBody.children).forEach(child => {
+                    if (child.id !== 'spinnerEdit') child.style.display = '';
+                });
             });
     }
 
+    window.simpanPegawai = function() {
+        // 1. Ubah tombol jadi "Menyimpan..."
+        const btn = document.querySelector('#modalTambah .btn-success');
+        const btnAsli = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btn.disabled = true; // Kunci tombol biar gak di-klik dobel
+
+        const data = {
+            nip: document.getElementById("tambahNip").value,
+            nik: document.getElementById("tambahNik").value,
+            nama: document.getElementById("tambahNama").value,
+            jabatan: document.getElementById("tambahJabatan").value,
+            status_asn: parseInt(document.getElementById("tambahStatus").value),
+            golongan: document.getElementById("tambahGolongan").value,
+            status_ptkp: document.getElementById("tambahPtkp").value,
+            alamat: document.getElementById("tambahAlamat").value
+        };
+
+        fetch(`${API_BASE_URL}/pegawai`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${Auth.getToken()}` },
+            body: JSON.stringify(data)
+        }).then(() => { 
+            $('#modalTambah').modal('hide'); 
+            loadData(); 
+            // 2. Balikin tombol seperti semula
+            btn.innerHTML = btnAsli;
+            btn.disabled = false;
+        });
+    }
+
     window.updatePegawai = function() {
+        // 1. Ubah tombol jadi "Menyimpan..."
+        const btn = document.querySelector('#modalEdit .btn-warning');
+        const btnAsli = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btn.disabled = true;
+
         const id = document.getElementById("editId").value;
         const data = {
             nip: document.getElementById("editNip").value,
@@ -303,11 +387,18 @@
             status_ptkp: document.getElementById("editPtkp").value,
             alamat: document.getElementById("editAlamat").value
         };
+
         fetch(`${API_BASE_URL}/pegawai/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${Auth.getToken()}` },
             body: JSON.stringify(data)
-        }).then(() => { $('#modalEdit').modal('hide'); loadData(); });
+        }).then(() => { 
+            $('#modalEdit').modal('hide'); 
+            loadData(); 
+            // 2. Balikin tombol
+            btn.innerHTML = btnAsli;
+            btn.disabled = false;
+        });
     }
 
     window.deletePegawai = function(id) {

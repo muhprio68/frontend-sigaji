@@ -107,6 +107,10 @@
         const tipe = newForm.querySelector("#importGaji_tipe").value;
         const bulan = newForm.querySelector("#importGaji_bulan").value;
         const tahun = newForm.querySelector("#importGaji_tahun").value;
+        
+        // 🔥 TANGKEP TOMBOL SUBMIT-NYA
+        const submitBtn = newForm.querySelector('button[type="submit"]');
+        const originalBtnHTML = submitBtn.innerHTML;
 
         if (!file || !tipe || !bulan || !tahun) {
             Swal.fire({
@@ -118,12 +122,16 @@
         }
 
         const formData = new FormData();
-        // Pastikan Backend Golang nyari kunci "file" ya bre
-        formData.append("file_gaji", file);         
+        formData.append("file_gaji", file);        
         formData.append("jenis_gaji", tipe);        
         formData.append("bulan_gaji", bulan);
         formData.append("tahun_gaji", tahun);
 
+        // 🔥 UBAH TOMBOL JADI ANIMASI LOADING & KUNCI TOMBOLNYA
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengimport Data...';
+        submitBtn.disabled = true;
+
+        // Tampilkan Popup Loading dari SweetAlert
         Swal.fire({
             title: 'Sedang Memproses...',
             text: 'Mohon tunggu, sistem sedang membaca Excel dan mengimport data.',
@@ -182,6 +190,10 @@
                     </button>
                 </div>
             `;
+        } finally {
+            // 🔥 APAPUN YANG TERJADI (SUKSES/GAGAL), BALIKIN TOMBOL KE SEMULA
+            submitBtn.innerHTML = originalBtnHTML;
+            submitBtn.disabled = false;
         }
     });
 })();

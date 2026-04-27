@@ -391,60 +391,88 @@
     
     window.changePage = function (page) { currentPage = page; displayTable(); setupPagination(); };
 
+    // ==========================================
+    // 1. ANIMASI MODAL DETAIL A2
+    // ==========================================
     window.showDetail = function (itemStr) {
-        let item = JSON.parse(itemStr);
-        let bAwal = item.BulanAwal || item.bulan_awal || "-";
-        let bAkhir = item.BulanAkhir || item.bulan_akhir || "-";
+        const modalBody = document.querySelector('#modalDetailA2 .modal-body');
 
-        document.getElementById("a2_dNip").innerText = item.NIP || item.nip || "-";
-        document.getElementById("a2_dNik").innerText = item.NIK || item.nik || "-";
-        document.getElementById("a2_dNama").innerText = item.Nama ? item.Nama.trim() : (item.nama ? item.nama.trim() : "-");
-        document.getElementById("a2_dJabatan").innerText = item.Jabatan || item.jabatan || "-";
-        document.getElementById("a2_dGolongan").innerText = item.Golongan || item.golongan || "-";
-        
-        document.getElementById("a2_dPtkp").innerText = item.StatusPTKP || item.status_ptkp || "-";
-        document.getElementById("a2_dMasa").innerText = bAwal + " s.d " + bAkhir;
-        
-        document.getElementById("a2_dInfoPtkp").innerText = formatRupiah(item.NilaiPTKP || item.nilai_ptkp);
+        // Sembunyikan konten asli sementara
+        Array.from(modalBody.children).forEach(child => {
+            if (child.id !== 'spinnerA2') child.style.display = 'none';
+        });
 
-        let gajiPokok = item.TotalGajiPokok || item.total_gaji_pokok || 0;
-        let tunjKeluarga = (item.TotalTunjIstri || item.total_tunj_istri || 0) + (item.TotalTunjAnak || item.total_tunj_anak || 0);
-        let tunjJabatan = item.TotalTunjJabatan || item.total_tunj_jabatan || 0;
-        let tunjBeras = item.TotalTunjBeras || item.total_tunj_beras || 0;
-        let tunjLain = item.TotalTunjLain || item.total_tunj_lain || 0; 
-        
-        let subtotalGaji = gajiPokok + tunjKeluarga + tunjJabatan + tunjBeras + tunjLain;
+        // Bikin & Tampilkan Spinner
+        let spinner = document.getElementById('spinnerA2');
+        if (!spinner) {
+            modalBody.insertAdjacentHTML('afterbegin', '<div id="spinnerA2" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><br><h6 class="text-muted font-weight-bold">Memuat Rincian Form 1721-A2...</h6></div>');
+            spinner = document.getElementById('spinnerA2');
+        }
+        spinner.style.display = 'block';
 
-        document.getElementById("a2_dGajiPokok").innerText = formatRupiah(gajiPokok);
-        document.getElementById("a2_dTunjKeluarga").innerText = formatRupiah(tunjKeluarga);
-        document.getElementById("a2_dTunjJabatan").innerText = formatRupiah(tunjJabatan);
-        document.getElementById("a2_dTunjBeras").innerText = formatRupiah(tunjBeras);
-        document.getElementById("a2_dTunjLain").innerText = formatRupiah(tunjLain);
-        document.getElementById("a2_dSubtotalGaji").innerText = formatRupiah(subtotalGaji);
-
-        let tppMurni = item.TotalTPP || item.total_tpp || 0;
-        let bpjs4TPP = item.TotalBPJS4TPP || item.total_bpjs4_tpp || 0;
-        let subtotalTPP = tppMurni + bpjs4TPP;
-
-        document.getElementById("a2_dTotalTPP").innerText = formatRupiah(tppMurni);
-        document.getElementById("a2_dTotalBPJS4TPP").innerText = formatRupiah(bpjs4TPP);
-        document.getElementById("a2_dSubtotalTPP").innerText = formatRupiah(subtotalTPP);
-
-        let totalBruto = item.TotalBruto || item.total_bruto || 0;
-        document.getElementById("a2_dBruto").innerText = formatRupiah(totalBruto);
-
-        let biayaJab = item.BiayaJabatan || item.biaya_jabatan || 0;
-        let iuranPensiun = item.TotalIWP || item.total_iwp || 0;
-        
-        document.getElementById("a2_dBiayaJabatan").innerText = formatRupiah(biayaJab);
-        document.getElementById("a2_dIuranPensiun").innerText = formatRupiah(iuranPensiun);
-        document.getElementById("a2_dTotalPengurangan").innerText = formatRupiah(biayaJab + iuranPensiun);
-
-        document.getElementById("a2_dNeto").innerText = formatRupiah(item.TotalNeto || item.total_neto);
-        document.getElementById("a2_dPkp").innerText = formatRupiah(item.PKP || item.pkp);
-        document.getElementById("a2_dPphSetahun").innerText = formatRupiah(item.PPh21Setahun || item.pph21_setahun);
-
+        // Munculkan Modal duluan
         $("#modalDetailA2").modal("show");
+
+        // Simulasi loading 0.5 detik
+        setTimeout(() => {
+            let item = JSON.parse(itemStr);
+            let bAwal = item.BulanAwal || item.bulan_awal || "-";
+            let bAkhir = item.BulanAkhir || item.bulan_akhir || "-";
+
+            document.getElementById("a2_dNip").innerText = item.NIP || item.nip || "-";
+            document.getElementById("a2_dNik").innerText = item.NIK || item.nik || "-";
+            document.getElementById("a2_dNama").innerText = item.Nama ? item.Nama.trim() : (item.nama ? item.nama.trim() : "-");
+            document.getElementById("a2_dJabatan").innerText = item.Jabatan || item.jabatan || "-";
+            document.getElementById("a2_dGolongan").innerText = item.Golongan || item.golongan || "-";
+            
+            document.getElementById("a2_dPtkp").innerText = item.StatusPTKP || item.status_ptkp || "-";
+            document.getElementById("a2_dMasa").innerText = bAwal + " s.d " + bAkhir;
+            
+            document.getElementById("a2_dInfoPtkp").innerText = formatRupiah(item.NilaiPTKP || item.nilai_ptkp);
+
+            let gajiPokok = item.TotalGajiPokok || item.total_gaji_pokok || 0;
+            let tunjKeluarga = (item.TotalTunjIstri || item.total_tunj_istri || 0) + (item.TotalTunjAnak || item.total_tunj_anak || 0);
+            let tunjJabatan = item.TotalTunjJabatan || item.total_tunj_jabatan || 0;
+            let tunjBeras = item.TotalTunjBeras || item.total_tunj_beras || 0;
+            let tunjLain = item.TotalTunjLain || item.total_tunj_lain || 0; 
+            
+            let subtotalGaji = gajiPokok + tunjKeluarga + tunjJabatan + tunjBeras + tunjLain;
+
+            document.getElementById("a2_dGajiPokok").innerText = formatRupiah(gajiPokok);
+            document.getElementById("a2_dTunjKeluarga").innerText = formatRupiah(tunjKeluarga);
+            document.getElementById("a2_dTunjJabatan").innerText = formatRupiah(tunjJabatan);
+            document.getElementById("a2_dTunjBeras").innerText = formatRupiah(tunjBeras);
+            document.getElementById("a2_dTunjLain").innerText = formatRupiah(tunjLain);
+            document.getElementById("a2_dSubtotalGaji").innerText = formatRupiah(subtotalGaji);
+
+            let tppMurni = item.TotalTPP || item.total_tpp || 0;
+            let bpjs4TPP = item.TotalBPJS4TPP || item.total_bpjs4_tpp || 0;
+            let subtotalTPP = tppMurni + bpjs4TPP;
+
+            document.getElementById("a2_dTotalTPP").innerText = formatRupiah(tppMurni);
+            document.getElementById("a2_dTotalBPJS4TPP").innerText = formatRupiah(bpjs4TPP);
+            document.getElementById("a2_dSubtotalTPP").innerText = formatRupiah(subtotalTPP);
+
+            let totalBruto = item.TotalBruto || item.total_bruto || 0;
+            document.getElementById("a2_dBruto").innerText = formatRupiah(totalBruto);
+
+            let biayaJab = item.BiayaJabatan || item.biaya_jabatan || 0;
+            let iuranPensiun = item.TotalIWP || item.total_iwp || 0;
+            
+            document.getElementById("a2_dBiayaJabatan").innerText = formatRupiah(biayaJab);
+            document.getElementById("a2_dIuranPensiun").innerText = formatRupiah(iuranPensiun);
+            document.getElementById("a2_dTotalPengurangan").innerText = formatRupiah(biayaJab + iuranPensiun);
+
+            document.getElementById("a2_dNeto").innerText = formatRupiah(item.TotalNeto || item.total_neto);
+            document.getElementById("a2_dPkp").innerText = formatRupiah(item.PKP || item.pkp);
+            document.getElementById("a2_dPphSetahun").innerText = formatRupiah(item.PPh21Setahun || item.pph21_setahun);
+
+            // Hilangkan spinner, tampilkan konten
+            spinner.style.display = 'none';
+            Array.from(modalBody.children).forEach(child => {
+                if (child.id !== 'spinnerA2') child.style.display = '';
+            });
+        }, 500); // 500ms delay
     };
 
    // 🔥 FUNGSI MODAL MASAL A2 🔥
@@ -456,36 +484,49 @@
     };
 
     // PAKE ID BARU KHUSUS A2
+   // ==========================================
+    // 2. ANIMASI DOWNLOAD XML MASSAL A2
+    // ==========================================
     const btnDownloadXMLMasalA2 = document.getElementById("btnDownloadXMLMasalA2");
     if(btnDownloadXMLMasalA2){
-        btnDownloadXMLMasalA2.addEventListener("click", function() {
+        btnDownloadXMLMasalA2.onclick = async function() {
             let tahun = tahunSelect.value;
             let tglPotong = document.getElementById("inputTglPotongMasalA2").value;
 
             if (!tglPotong) {
-                alert("Tanggal Potong wajib diisi!");
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal Potong wajib diisi!' });
                 document.getElementById("inputTglPotongMasalA2").focus();
                 return;
             }
 
             let downloadUrl = `${API_BASE_URL}/pph21/tahunan-export-a2?tahun=${tahun}&tgl_potong=${tglPotong}`;
 
-            let originalText = btnDownloadXMLMasalA2.innerHTML;
-            btnDownloadXMLMasalA2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
-            btnDownloadXMLMasalA2.disabled = true;
+            // Tutup Modal Bootstrap Duluan
+            $('#modalGenerateMasalA2').modal('hide');
 
-            fetch(downloadUrl, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    if (res.status === 401) Auth.logout();
-                    throw new Error("Gagal generate XML Masal A2");
+            // Munculin Loading SweetAlert
+            Swal.fire({
+                title: 'Membuat Bulk XML A2...',
+                text: 'Mohon tunggu, meracik ratusan data PNS & CPNS untuk Coretax.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const response = await fetch(downloadUrl, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) { Swal.close(); Auth.logout(); return; }
+                    let errorMsg = "Gagal men-generate file XML Massal A2.";
+                    try { const errData = await response.json(); if (errData.message) errorMsg = errData.message; } catch(e) { }
+                    throw new Error(errorMsg);
                 }
-                return res.blob();
-            })
-            .then(blob => {
+
+                const blob = await response.blob();
                 const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -496,22 +537,18 @@
                 a.remove();
                 window.URL.revokeObjectURL(urlBlob);
 
-                btnDownloadXMLMasalA2.innerHTML = originalText;
-                btnDownloadXMLMasalA2.disabled = false;
-                $('#modalGenerateMasalA2').modal('hide');
-                
+                // Tampilkan sukses!
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Bulk XML A2 berhasil diunduh.', timer: 2500, showConfirmButton: false });
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gagal Unduh', text: error.message });
+            } finally {
                 setTimeout(() => {
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open').css('padding-right', '');
                 }, 300);
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Gagal mengunduh file XML Massal A2.");
-                btnDownloadXMLMasalA2.innerHTML = originalText;
-                btnDownloadXMLMasalA2.disabled = false;
-            });
-        });
+            }
+        };
     }
 
     // 🔥 FUNGSI MODAL INDIVIDU A2 🔥
@@ -523,39 +560,50 @@
         $('#modalGeneratePerOrang').modal('show');
     };
 
-    // PAKE ID BARU KHUSUS A2
+    // 3. ANIMASI DOWNLOAD XML INDIVIDU A2
+    // ==========================================
     const btnDownloadXMLPerOrangA2 = document.getElementById("btnDownloadXMLPerOrangA2");
     if(btnDownloadXMLPerOrangA2){
-        btnDownloadXMLPerOrangA2.addEventListener("click", function() {
+        btnDownloadXMLPerOrangA2.onclick = async function() {
             let id = document.getElementById("modalGenId").value;
             let tahun = tahunSelect.value;
             let tglPotong = document.getElementById("inputTglPotongPerOrangA2").value;
             let namaPegawai = document.getElementById("modalGenNama").innerText.replace(/[^a-zA-Z0-9]/g, "_");
 
             if (!tglPotong) {
-                alert("Tanggal Potong wajib diisi!");
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Tanggal Potong wajib diisi!' });
                 document.getElementById("inputTglPotongPerOrangA2").focus();
                 return;
             }
 
             let downloadUrl = `${API_BASE_URL}/pph21/tahunan-export-a2?tahun=${tahun}&id=${id}&tgl_potong=${tglPotong}`;
 
-            let originalText = btnDownloadXMLPerOrangA2.innerHTML;
-            btnDownloadXMLPerOrangA2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
-            btnDownloadXMLPerOrangA2.disabled = true;
+            // Tutup Modal Bootstrap Duluan
+            $('#modalGeneratePerOrang').modal('hide');
 
-            fetch(downloadUrl, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    if (res.status === 401) Auth.logout();
-                    throw new Error("Gagal generate XML Per Orang A2");
+            // Munculin Loading SweetAlert
+            Swal.fire({
+                title: 'Membuat XML A2...',
+                text: `Meracik data untuk ${document.getElementById("modalGenNama").innerText}.`,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                const response = await fetch(downloadUrl, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) { Swal.close(); Auth.logout(); return; }
+                    let errorMsg = "Gagal men-generate file XML Individu A2.";
+                    try { const errData = await response.json(); if (errData.message) errorMsg = errData.message; } catch(e) { }
+                    throw new Error(errorMsg);
                 }
-                return res.blob();
-            })
-            .then(blob => {
+
+                const blob = await response.blob();
                 const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -566,22 +614,17 @@
                 a.remove();
                 window.URL.revokeObjectURL(urlBlob);
 
-                btnDownloadXMLPerOrangA2.innerHTML = originalText;
-                btnDownloadXMLPerOrangA2.disabled = false;
-                $('#modalGeneratePerOrang').modal('hide');
-                
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'XML A2 berhasil diunduh.', timer: 2500, showConfirmButton: false });
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gagal Unduh', text: error.message });
+            } finally {
                 setTimeout(() => {
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open').css('padding-right', '');
                 }, 300);
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Gagal mengunduh file XML Per Orang A2.");
-                btnDownloadXMLPerOrangA2.innerHTML = originalText;
-                btnDownloadXMLPerOrangA2.disabled = false;
-            });
-        });
+            }
+        };
     }
 
     loadData();
