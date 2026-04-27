@@ -8,7 +8,6 @@
 
     <link href="assets/sb-admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
     <link href="assets/sb-admin/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="assets/css/custom.css" rel="stylesheet">
 </head>
@@ -16,22 +15,20 @@
 <body id="page-top">
 
     <div id="wrapper">
-
         <div id="sidebar-container"></div>
-
+        
         <div id="content-wrapper" class="d-flex flex-column">
-
             <div id="content">
-
                 <div id="topbar-container"></div>
-
+                
                 <div class="container-fluid" id="app-content">
                     <div class="text-center py-5">
                         <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
                         <p>Memuat halaman...</p>
                     </div>
                 </div>
-                </div>
+            </div>
+            
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
@@ -41,63 +38,64 @@
             </footer>
         </div>
     </div>
+
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
-    <div class="modal fade" id="profilModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title font-weight-bold">Profil Pengguna</h5>
-                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body text-center pt-4">
-                <div class="img-profile rounded-circle d-inline-flex align-items-center justify-content-center bg-light text-primary shadow-sm mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <h4 class="font-weight-bold text-gray-900 mb-1" id="modalNama">...</h4>
-                <p class="text-primary font-weight-bold mb-4" id="modalJabatan">...</p>
-                <ul class="list-group list-group-flush text-left mt-2">
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-2">
-                        <span class="text-muted"><i class="fas fa-id-badge mr-2"></i>Username/NIP</span>
-                        <span class="font-weight-bold text-gray-800" id="modalUsername">...</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-2">
-                        <span class="text-muted"><i class="fas fa-envelope mr-2"></i>Email</span>
-                        <span class="font-weight-bold text-gray-800" id="modalEmail">...</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-2">
-                        <span class="text-muted"><i class="fas fa-shield-alt mr-2"></i>Hak Akses</span>
-                        <span class="badge badge-success px-2 py-1 text-uppercase" id="modalRole">...</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title font-weight-bold">Konfirmasi Keluar</h5>
-                <button class="close text-white" type="button" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">Apakah Anda yakin ingin keluar dari aplikasi SIGAJI? Sesi Anda akan diakhiri.</div>
-            <div class="modal-footer bg-light">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                <button class="btn btn-danger" onclick="executeLogout()">Ya, Keluar</button>
+    <div class="modal fade" id="profilModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold">Profil Pengguna</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body text-center pt-4">
+                    <div class="img-profile rounded-circle d-inline-flex align-items-center justify-content-center bg-light text-primary shadow-sm mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4 class="font-weight-bold text-gray-900 mb-1" id="modalNama">...</h4>
+                    <p class="text-primary font-weight-bold mb-4" id="modalJabatan">...</p>
+                    <ul class="list-group list-group-flush text-left mt-2">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-2">
+                            <span class="text-muted"><i class="fas fa-id-badge mr-2"></i>Username/NIP</span>
+                            <span class="font-weight-bold text-gray-800" id="modalUsername">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-2">
+                            <span class="text-muted"><i class="fas fa-envelope mr-2"></i>Email</span>
+                            <span class="font-weight-bold text-gray-800" id="modalEmail">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-2">
+                            <span class="text-muted"><i class="fas fa-shield-alt mr-2"></i>Hak Akses</span>
+                            <span class="badge badge-success px-2 py-1 text-uppercase" id="modalRole">...</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title font-weight-bold">Konfirmasi Keluar</h5>
+                    <button class="close text-white" type="button" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">Apakah Anda yakin ingin keluar dari aplikasi SIGAJI? Sesi Anda akan diakhiri.</div>
+                <div class="modal-footer bg-light">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                    <button class="btn btn-danger" onclick="executeLogout()">Ya, Keluar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="assets/js/config.js"></script>
     <script src="assets/js/auth.js"></script>
-
     <script src="assets/sb-admin/vendor/jquery/jquery.min.js"></script>
     <script src="assets/sb-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/sb-admin/vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -105,22 +103,16 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
-        Auth.check();
+            Auth.check();
 
-        // 1. Load Sidebar
-        await loadComponent('partials/sidebar.html', 'sidebar-container');
-        
-        // 2. Load Navbar DAN Suntik Data User
-        await loadComponent('partials/navbar.html', 'topbar-container');
-        
-        // 🔥 PANGGIL DISINI SETELAH NAVBAR LOAD SELESAI
-        injectUserData(); 
+            await loadComponent('partials/sidebar.html', 'sidebar-container');
+            await loadComponent('partials/navbar.html', 'topbar-container');
+            
+            injectUserData(); 
+            loadPage('pages/dashboard.html');
+            initSidebarInteraction();
+        });
 
-        loadPage('pages/dashboard.html');
-        initSidebarInteraction();
-    });
-
-// Fungsi memuat komponen layout (Navbar, Sidebar)
         async function loadComponent(file, containerId) {
             try {
                 const response = await fetch(file);
@@ -128,8 +120,6 @@
                     const html = await response.text();
                     const container = document.getElementById(containerId);
                     container.innerHTML = html;
-                    
-                    // 🔥 JURUS PAMUNGKAS: Paksa browser jalanin <script> di dalam komponen
                     executeScripts(container);
                 }
             } catch (err) {
@@ -141,7 +131,6 @@
             $('.sidebar .nav-item').removeClass('active');
             $('.sidebar .collapse-item').removeClass('active');
 
-            // Pastikan cuma nyari tag <a> yang ada di dalam .nav-item
             let targetLink = $(`.sidebar .nav-item a[onclick*="${filename}"]`);
 
             if (targetLink.length > 0) {
@@ -155,17 +144,14 @@
             }
         }
 
-        // Fungsi memuat konten dinamis (pengganti perpindahan halaman)
         async function loadPage(fullUrl) {
             const container = document.getElementById('app-content');
             container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i></div>';
             
-            // 1. Pisahkan nama file dan parameternya
             const parts = fullUrl.split('?');
-            const file = parts[0];         // contoh: 'content_pegawai.html'
-            const queryString = parts[1];  // contoh: 'jenis=pns'
+            const file = parts[0]; 
+            const queryString = parts[1]; 
 
-            // 2. Ubah URL Browser diam-diam biar Script di dalam bisa baca paramnya
             if (queryString) {
                 window.history.pushState({}, '', '?' + queryString);
             } else {
@@ -175,13 +161,10 @@
             setActiveSidebar(file);
 
             try {
-                // 3. Fetch nama filenya aja (Biar Live Server gak ngambek 404)
                 const response = await fetch(file);
                 if(response.ok) {
                     const html = await response.text();
                     container.innerHTML = html;
-                    
-                    // Eksekusi ulang script
                     executeScripts(container);
                 } else {
                     container.innerHTML = `<div class="alert alert-danger text-center">Halaman <b>${file}</b> belum dibuat atau tidak ditemukan.</div>`;
@@ -191,21 +174,15 @@
             }
         }
 
-        
-
-        // Mengeksekusi ulang tag <script> yang ter-load via fetch
         function executeScripts(container) {
-            // 1. Bersihkan sampah modal lama sebelum load yang baru
             $('.modal-backdrop').remove();
             $('body').removeClass('modal-open').css('padding-right', '');
 
-            // 2. JURUS BRUTAL: Pindahkan modal ke luar agar tidak stuck
             const modals = container.querySelectorAll('.modal');
             modals.forEach(modal => {
-                document.body.appendChild(modal); // Pindahin modal langsung ke bawah body
+                document.body.appendChild(modal); 
             });
 
-            // 3. Jalankan script bawaan lu (copy script tag)
             const scripts = container.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
@@ -216,126 +193,98 @@
         }
 
         function initSidebarInteraction() {
-            // Bersihin event lama
-            $(document).off('click', '.sidebar a');
+            // 🔥 JURUS PAMUNGKAS: LOGIKA HAMBURGER DAN MENU JADI SATU DI SINI
+            
+            // 1. Klik Hamburger Menu
+            $(document).off('click', '#sidebarToggleTop, #sidebarToggle');
+            $(document).on('click', '#sidebarToggleTop, #sidebarToggle', function(e) {
+                e.preventDefault();
+                $("body").toggleClass("sidebar-toggled");
+                $(".sidebar").toggleClass("toggled");
+                
+                // Lipat semua menu dropdown kalau di-kecilin
+                if ($(".sidebar").hasClass("toggled")) {
+                    $('.sidebar .collapse').collapse('hide');
+                }
+            });
 
-            // Deteksi kalau ada link di sidebar yang diklik
+            // 2. Klik Item Menu (Link Sidebar)
+            $(document).off('click', '.sidebar a');
             $(document).on('click', '.sidebar a', function(e) {
                 var $this = $(this);
 
-                // Abaikan kalau yang diklik itu tombol induknya (Dropdown)
-                if ($this.attr('data-toggle') === 'collapse') {
+                // Abaikan kalau klik logo atau menu dropdown ("Data Pegawai")
+                if ($this.attr('data-toggle') === 'collapse' || $this.hasClass('sidebar-brand')) {
                     return; 
                 }
 
-                // 🔥 JURUS BARU: Abaikan kalau yang diklik itu Logo / Brand
-                if ($this.hasClass('sidebar-brand')) {
-                    return; 
-                }
-
-                // 1. URUSAN WARNA (ACTIVE STATE)
+                // Warnain menu yang aktif
                 $('.sidebar .nav-item').removeClass('active');
                 $('.sidebar .collapse-item').removeClass('active');
 
                 if ($this.hasClass('collapse-item')) {
-                    // Kalau ngeklik sub-menu (PNS / PPPK)
                     $this.addClass('active');
                     $this.closest('.nav-item').addClass('active');
-                } else {
-                    // Kalau ngeklik menu tunggal (Dashboard / Import)
-                    $this.closest('.nav-item').addClass('active');
                     
-                    // 2. TUTUP OTOMATIS: Karena ini menu tunggal, tutup semua folder yang mangap
-                    $('.sidebar .collapse.show').collapse('hide');
+                    // Kalau mode mini (toggled), sembunyiin kotak putih PNS/PPPK habis diklik
+                    if ($(".sidebar").hasClass("toggled")) {
+                        $this.closest('.collapse').removeClass('show');
+                    }
+                } else {
+                    $this.closest('.nav-item').addClass('active');
+                    $('.sidebar .collapse.show').collapse('hide'); // Lipat folder yang kebuka
+                }
+
+                // Kalau di layar HP (< 768px), otomatis tutup sidebar habis milih menu
+                if ($(window).width() < 768) {
+                    $("body").removeClass("sidebar-toggled");
+                    $(".sidebar").removeClass("toggled");
                 }
             });
         }
         
-        // Fungsi global untuk link menu (Panggil di sidebar: onclick="loadPage('content_pegawai.html')")
         window.loadPage = loadPage;
+
+        // Fungsi Global
+        function updateClock() {
+            const now = new Date();
+            const dateEl = document.getElementById('realtimeDate');
+            const clockEl = document.getElementById('realtimeClock');
+            
+            if (dateEl) dateEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            if (clockEl) clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+        }
+        setInterval(updateClock, 1000);
+
+        function executeLogout() {
+            $('#logoutModal').modal('hide');
+            setTimeout(() => {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }, 300);
+        }
+
+        function injectUserData() {
+            const rawData = localStorage.getItem('user_data');
+            if (!rawData) return;
+
+            try {
+                const user = JSON.parse(rawData);
+                const navName = document.getElementById('navUsername');
+                const navJab = document.getElementById('navUserJabatan'); 
+                
+                if(navName) navName.innerText = user.nama || user.username || user.email;
+                if(navJab)  navJab.innerText = user.jabatan || user.role;
+                
+                if(document.getElementById('modalNama'))     document.getElementById('modalNama').innerText = user.nama;
+                if(document.getElementById('modalEmail'))    document.getElementById('modalEmail').innerText = user.email;
+                if(document.getElementById('modalJabatan'))  document.getElementById('modalJabatan').innerText = user.jabatan;
+                if(document.getElementById('modalUsername')) document.getElementById('modalUsername').innerText = user.username;
+                if(document.getElementById('modalRole'))     document.getElementById('modalRole').innerText = user.role.toUpperCase();
+            } catch (e) {
+                console.error("Gagal parsing user_data", e);
+            }
+        }
     </script>
-    <script>
-// Jurus Event Delegation buat SPA (Anti Lupa Tombol)
-$(document).ready(function() {
-    
-    // Matikan dulu script lama bawaan SB Admin biar gak bentrok
-    $(document).off('click', '#sidebarToggle, #sidebarToggleTop');
-
-    // Pasang script baru yang tahan banting di mode SPA
-    $(document).on('click', '#sidebarToggle, #sidebarToggleTop', function(e) {
-        $("body").toggleClass("sidebar-toggled");
-        $(".sidebar").toggleClass("toggled");
-        
-        // Kalau sidebar mengecil, tutup menu yang lagi kebuka
-        if ($(".sidebar").hasClass("toggled")) {
-          $('.sidebar .collapse').collapse('hide');
-        };
-    });
-
-    // Fix buat layar HP: Kalau layar di-resize, sesuaikan sidebarnya
-    $(window).resize(function() {
-        if ($(window).width() < 768) {
-            $('.sidebar .collapse').collapse('hide');
-        }
-        if ($(window).width() < 480 && !$(".sidebar").hasClass("toggled")) {
-            $("body").addClass("sidebar-toggled");
-            $(".sidebar").addClass("toggled");
-            $('.sidebar .collapse').collapse('hide');
-        }
-    });
-});
-</script>
-
-<script>
-    // 1. Fungsi Jam & Tanggal Realtime (Global)
-    function updateClock() {
-        const now = new Date();
-        const dateEl = document.getElementById('realtimeDate');
-        const clockEl = document.getElementById('realtimeClock');
-        
-        if (dateEl) dateEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        if (clockEl) clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
-    }
-    setInterval(updateClock, 1000);
-
-    // 2. Fungsi Eksekusi Logout
-    function executeLogout() {
-        $('#logoutModal').modal('hide');
-        setTimeout(() => {
-            // Bersihkan storage & tendang ke login
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }, 300);
-    }
-
-    // 3. Fungsi Suntik Data User (Role vs Level)
-    function injectUserData() {
-    const rawData = localStorage.getItem('user_data');
-    if (!rawData) return;
-
-    try {
-        const user = JSON.parse(rawData);
-        
-        // Update di Navbar (Cek ID sesuai navbar.html lu)
-        const navName = document.getElementById('navUsername');
-        const navJab = document.getElementById('navUserJabatan'); // Tambahin ID ini di navbar.html lu
-        
-        if(navName) navName.innerText = user.nama || user.username || user.email;
-        if(navJab)  navJab.innerText = user.jabatan || user.role;
-        
-        // Update di Modal Profil (Index.html)
-        if(document.getElementById('modalNama'))     document.getElementById('modalNama').innerText = user.nama;
-        if(document.getElementById('modalEmail'))     document.getElementById('modalEmail').innerText = user.email;
-        if(document.getElementById('modalJabatan'))  document.getElementById('modalJabatan').innerText = user.jabatan;
-        if(document.getElementById('modalUsername')) document.getElementById('modalUsername').innerText = user.username;
-        if(document.getElementById('modalRole'))     document.getElementById('modalRole').innerText = user.role.toUpperCase();
-    } catch (e) {
-        console.error("Gagal parsing user_data", e);
-    }
-    }
-
-    // Jalankan inject data setiap kali navbar selesai di-load oleh router SPA lu
-    // Panggil injectUserData() di dalam callback fetch navbar lu.
-</script>
 </body>
 </html>

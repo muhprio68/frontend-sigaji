@@ -1,69 +1,94 @@
-/* Styling biar logo Bojonegoro gak gepeng pas sidebar ditutup */
-.sidebar.toggled .sidebar-brand .sidebar-brand-icon img {
-    width: 25px !important;
-    height: auto !important;
+/* =========================================================
+   1. LAYOUT UTAMA (BIRU FULL & ANTI DOUBLE SCROLL)
+========================================================= */
+html, body {
+    min-height: 100vh; 
+    margin: 0;
+    padding: 0;
 }
 
-/* Formula Paksa Sidebar Full Height */
 #wrapper {
     display: flex;
-    min-height: 100vh; /* Minimal setinggi layar */
-    height: auto;      /* Bisa melar lebih dari layar */
-    align-items: stretch;
+    min-height: 100vh;
+    align-items: stretch; /* Narik tinggi sama rata */
+}
+
+/* 🔥 INI OBATNYA: Maksa pembungkus sidebar lu ikut melar 🔥 */
+#sidebar-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #f8f9fc;
+    overflow-x: hidden; 
 }
 
 #accordionSidebar {
-    /* Biar warna birunya ditarik sampai bawah ngikutin wrapper */
-    min-height: 100%; 
-    height: auto !important;
+    flex: 1; /* Maksa warna biru narik sampai dasar container */
+    z-index: 1040;
+}
+
+/* =========================================================
+   2. FIX LOGO SAAT SIDEBAR MENGECIL
+========================================================= */
+.sidebar.toggled .sidebar-brand-text {
+    display: none !important; /* Hilangkan teks "SIGAJI" */
+}
+.sidebar.toggled .sidebar-brand-icon img {
+    width: 25px !important; /* Kecilin logo Bojonegoro */
+    transition: all 0.2s ease;
+}
+
+/* =========================================================
+   3. MENU MELAYANG (PNS/PPPK) PAS SIDEBAR KECIL
+========================================================= */
+@media (min-width: 768px) {
+    /* Biar menu gak kepotong warna biru */
+    .sidebar.toggled {
+        overflow: visible !important;
+    }
     
-    /* Tambahan biar pas scroll tetap stabil */
-    display: flex;
-    flex-direction: column;
-}
-
-#content-wrapper {
-    flex: 1; /* Biar konten ngambil sisa ruang yang ada */
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* Fix untuk mobile: pastikan sidebar gak nutupin layar tapi tetap full */
-@media (max-width: 768px) {
-    #wrapper {
-        min-height: 100vh;
+    /* Paksa kotak sub-menu melayang di kanan ikon */
+    .sidebar.toggled .nav-item .collapse {
+        position: absolute !important;
+        left: calc(6.5rem) !important;
+        z-index: 1050 !important;
+        top: 0;
+        display: none; /* Sembunyi kalau gak disorot */
+    }
+    
+    /* Munculin pas mouse ngelewatin menu (Hover) */
+    .sidebar.toggled .nav-item:hover .collapse {
+        display: block !important;
+    }
+    
+    /* Percantik kotak putihnya */
+    .sidebar.toggled .nav-item .collapse .collapse-inner {
+        background-color: white !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        border-radius: 0.35rem !important;
+        width: 10rem !important;
+        margin: 0 !important;
     }
 }
 
-/* Pastikan Topbar dan Tombol Navigasi selalu di lapisan paling atas */
-.topbar {
-    z-index: 1000 !important;
-    position: relative !important;
-}
-
-#sidebarToggle, 
-#sidebarToggleTop, 
-.topbar .nav-item {
-    z-index: 1001 !important;
-    position: relative !important;
-    cursor: pointer !important;
-    pointer-events: auto !important; /* Paksa klik tembus */
-}
-
-/* Pastikan wrapper konten tidak menutupi header */
-#content-wrapper {
+/* =========================================================
+   4. FIX Z-INDEX MODAL & HAMBURGER
+========================================================= */
+#sidebarToggleTop {
+    z-index: 1050 !important;
     position: relative;
-    z-index: 1;
+    cursor: pointer;
 }
-
-/* Solusi kalau modal sering stuck di belakang layar abu-abu */
 .modal {
     overflow-y: auto !important;
+    z-index: 1060 !important;
 }
 .modal-backdrop {
-    z-index: 1040 !important;
-}
-.modal {
     z-index: 1050 !important;
 }

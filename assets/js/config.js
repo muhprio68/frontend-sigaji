@@ -15,3 +15,4 @@ function formatTanggal(tanggal) {
     const d = new Date(tanggal);
     return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
+
