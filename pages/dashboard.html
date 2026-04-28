@@ -241,7 +241,7 @@
         }).format(date) + ' WIB';
     }
 
-    // Fungsi Utama Load Data
+   // Fungsi Utama Load Data (Animasi Smooth & Kalem)
     function loadData() {
         const tahun = filterTahun.value;
         const bulan = parseInt(filterBulan.value);
@@ -249,22 +249,13 @@
 
         infoPeriode.innerText = `${textBulan} ${tahun}`;
         
-        // Sembunyikan loader bawaan karena kita pake SweetAlert
-        loader.style.display = 'none';
+        // 1. Tampilkan loader bawaan (spinner biru kecil) & pudarkan kartu
+        loader.style.display = 'block';
+        summaryCards.style.opacity = '0.4';
+        tableBody.style.opacity = '0.4';
         
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data LRA...</td></tr>`;
-        summaryCards.style.opacity = '0.5';
-
-        // Munculin Loading SweetAlert
-        Swal.fire({
-            title: 'Memuat Dashboard...',
-            text: 'Sedang menghitung rekapitulasi Realisasi Anggaran.',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        // Teks loading di dalam tabel
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data realisasi...</td></tr>`;
 
         // 🔥 Tembak API Pake Karcis Satpam (JWT Token) 🔥
         fetch(`${API_BASE_URL}/realisasi?tahun=${tahun}&bulan=${bulan}`, {
@@ -276,7 +267,7 @@
         })
         .then(response => {
             if (!response.ok) { 
-                if(response.status === 401) Auth.logout(); // Tendang kalau token expired
+                if(response.status === 401) Auth.logout(); 
                 throw new Error('Network response was not ok'); 
             }
             return response.json();
@@ -284,21 +275,18 @@
         .then(res => {
             const data = res.data || [];
             
-            // Update Waktu dan Jumlah Pegawai dari JSON API
             let waktuUpdate = res.last_updated ? formatWaktu(res.last_updated) : formatWaktu(new Date().toISOString());
             textUpdateTerakhir.innerText = waktuUpdate;
             
             textTotalPNS.innerText = (res.total_pns || 0) + " Orang";
             textTotalPPPK.innerText = (res.total_pppk || 0) + " Orang";
             
-            // Deklarasi Variabel Hitungan
             let grandTotalPagu = 0; let grandTotalRealisasi = 0; let grandTotalSisa = 0;
             let totalPph = 0; let totalBpjs = 0; let totalTaspen = 0;
             let countAman = 0; let countMenipis = 0; let countKritis = 0;
             let htmlListKritis = '';
             let html = '';
 
-            // Jika Data Kosong
             if (data.length === 0) {
                 html = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data realisasi pada periode ini.</td></tr>`;
                 elPph.innerText = "Rp 0"; elBpjs.innerText = "Rp 0"; elTaspen.innerText = "Rp 0";
@@ -310,7 +298,6 @@
                 document.getElementById('cardSisa').innerText = "0";
                 document.getElementById('cardPersen').innerText = "0%";
             } else {
-                // Looping Data Tabel
                 data.forEach(item => {
                     grandTotalPagu += item.pagu_anggaran;
                     grandTotalRealisasi += item.total_realisasi;
@@ -318,7 +305,6 @@
 
                     let realisasiClass = item.total_realisasi > 0 ? "text-red" : "";
                     
-                    // Hitung Status Pagu (Aman, Menipis, Kritis)
                     if (item.pagu_anggaran > 0) {
                         let persenSisa = (item.sisa_anggaran / item.pagu_anggaran) * 100;
                         if (persenSisa >= 30) {
@@ -332,7 +318,6 @@
                         }
                     }
 
-                    // Buat Baris Tabel HTML
                     html += `
                         <tr>
                             <td class="kode-rek">${item.kode_rekening}</td>
@@ -344,16 +329,13 @@
                         </tr>
                     `;
 
-                    // Jumlahkan Rekap Potongan
                     if (item.id === 12) totalPph += item.total_realisasi;
                     else if (item.id === 15 || item.id === 16) totalBpjs += item.total_realisasi;
                     else if (item.id >= 17 && item.id <= 20) totalTaspen += item.total_realisasi;
                 });
 
-                // Hitung Grand Persentase
                 let grandPersen = grandTotalPagu > 0 ? (grandTotalRealisasi / grandTotalPagu) * 100 : 0;
 
-                // Tambahkan Baris JUMLAH
                 html += `
                     <tr class="font-weight-bold bg-light">
                         <td colspan="2" class="text-center">JUMLAH</td>
@@ -364,18 +346,15 @@
                     </tr>
                 `;
 
-                // Masukkan ke 4 Kartu Atas
                 document.getElementById('cardPagu').innerText = formatRupiah(grandTotalPagu);
                 document.getElementById('cardRealisasi').innerText = formatRupiah(grandTotalRealisasi);
                 document.getElementById('cardSisa').innerText = formatRupiah(grandTotalSisa);
                 document.getElementById('cardPersen').innerText = formatPersen(grandPersen);
 
-                // Masukkan ke Rekap Potongan
                 elPph.innerText = 'Rp ' + formatRupiah(totalPph);
                 elBpjs.innerText = 'Rp ' + formatRupiah(totalBpjs);
                 elTaspen.innerText = 'Rp ' + formatRupiah(totalTaspen);
 
-                // Masukkan ke Status Pagu
                 elStatusAman.innerText = countAman;
                 elStatusMenipis.innerText = countMenipis;
                 elStatusKritis.innerText = countKritis;
@@ -388,24 +367,21 @@
                 }
             }
 
-            // Render HTML Tabel
+            // 2. Data Selesai! Hilangkan loader, terangin lagi tabel & kartunya
             tableBody.innerHTML = html;
+            loader.style.display = 'none';
             summaryCards.style.opacity = '1';
-
-            // TUTUP LOADING SWEETALERT
-            Swal.close();
+            tableBody.style.opacity = '1';
+            
         })
         .catch(err => {
             console.error("Fetch Error:", err);
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data API. Pastikan server Golang sedang berjalan.</td></tr>`;
-            summaryCards.style.opacity = '1';
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle mr-2"></i> Gagal memuat data API.</td></tr>`;
             
-            // Tutup loading dan ganti dengan error
-            Swal.fire({
-                icon: 'error',
-                title: 'Koneksi Terputus',
-                text: 'Gagal menghubungi server untuk mengambil data Dashboard.'
-            });
+            // Kembalikan opacity
+            loader.style.display = 'none';
+            summaryCards.style.opacity = '1';
+            tableBody.style.opacity = '1';
         });
     }
 
