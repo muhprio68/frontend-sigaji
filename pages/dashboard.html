@@ -242,22 +242,19 @@
     }
 
    // Fungsi Utama Load Data (Animasi Smooth & Kalem)
-    function loadData() {
+   function loadData() {
         const tahun = filterTahun.value;
         const bulan = parseInt(filterBulan.value);
         const textBulan = filterBulan.options[filterBulan.selectedIndex].text;
 
         infoPeriode.innerText = `${textBulan} ${tahun}`;
         
-        // 1. Tampilkan loader bawaan (spinner biru kecil) & pudarkan kartu
         loader.style.display = 'block';
         summaryCards.style.opacity = '0.4';
         tableBody.style.opacity = '0.4';
         
-        // Teks loading di dalam tabel
         tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data realisasi...</td></tr>`;
 
-        // 🔥 Tembak API Pake Karcis Satpam (JWT Token) 🔥
         fetch(`${API_BASE_URL}/realisasi?tahun=${tahun}&bulan=${bulan}`, {
             method: 'GET',
             headers: {
@@ -289,23 +286,29 @@
 
             if (data.length === 0) {
                 html = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data realisasi pada periode ini.</td></tr>`;
-                elPph.innerText = "Rp 0"; elBpjs.innerText = "Rp 0"; elTaspen.innerText = "Rp 0";
-                elStatusAman.innerText = "0"; elStatusMenipis.innerText = "0"; elStatusKritis.innerText = "0";
-                boxAlertKritis.style.display = 'none';
-                
+                // ... (reset elemen lainnya ke 0)
                 document.getElementById('cardPagu').innerText = "0";
                 document.getElementById('cardRealisasi').innerText = "0";
                 document.getElementById('cardSisa').innerText = "0";
                 document.getElementById('cardPersen').innerText = "0%";
             } else {
                 data.forEach(item => {
+                    // 1. TETAP HITUNG SEMUA (Buat kartu ringkasan & rekap potongan)
                     grandTotalPagu += item.pagu_anggaran;
                     grandTotalRealisasi += item.total_realisasi;
                     grandTotalSisa += item.sisa_anggaran;
 
+                    if (item.id === 12) totalPph += item.total_realisasi;
+                    else if (item.id === 15 || item.id === 16) totalBpjs += item.total_realisasi;
+                    else if (item.id >= 17 && item.id <= 20) totalTaspen += item.total_realisasi;
+
+                    // 2. FILTER TAMPILAN: Hanya render ke tabel dashboard jika Pagu > 0
+                    // Tapi baris Pagu 0 tetap "ada" (d-none) supaya XLSX bisa baca
+                    let isZeroPagu = item.pagu_anggaran <= 0;
+                    let rowClass = isZeroPagu ? "d-none" : "";
                     let realisasiClass = item.total_realisasi > 0 ? "text-red" : "";
-                    
-                    if (item.pagu_anggaran > 0) {
+
+                    if (!isZeroPagu) {
                         let persenSisa = (item.sisa_anggaran / item.pagu_anggaran) * 100;
                         if (persenSisa >= 30) {
                             countAman++;
@@ -318,8 +321,9 @@
                         }
                     }
 
+                    // Tambahkan ke HTML (pagu 0 pakai d-none biar sembunyi tapi tetep ke-export)
                     html += `
-                        <tr>
+                        <tr class="${rowClass}">
                             <td class="kode-rek">${item.kode_rekening}</td>
                             <td>${item.uraian}</td>
                             <td class="text-right">${formatRupiah(item.pagu_anggaran)}</td>
@@ -328,14 +332,11 @@
                             <td class="text-center">${formatPersen(item.persentase)}</td>
                         </tr>
                     `;
-
-                    if (item.id === 12) totalPph += item.total_realisasi;
-                    else if (item.id === 15 || item.id === 16) totalBpjs += item.total_realisasi;
-                    else if (item.id >= 17 && item.id <= 20) totalTaspen += item.total_realisasi;
                 });
 
                 let grandPersen = grandTotalPagu > 0 ? (grandTotalRealisasi / grandTotalPagu) * 100 : 0;
 
+                // Tambahkan baris total di paling bawah tabel
                 html += `
                     <tr class="font-weight-bold bg-light">
                         <td colspan="2" class="text-center">JUMLAH</td>
@@ -346,6 +347,7 @@
                     </tr>
                 `;
 
+                // Update Angka di Kartu Dashboard
                 document.getElementById('cardPagu').innerText = formatRupiah(grandTotalPagu);
                 document.getElementById('cardRealisasi').innerText = formatRupiah(grandTotalRealisasi);
                 document.getElementById('cardSisa').innerText = formatRupiah(grandTotalSisa);
@@ -367,18 +369,14 @@
                 }
             }
 
-            // 2. Data Selesai! Hilangkan loader, terangin lagi tabel & kartunya
             tableBody.innerHTML = html;
             loader.style.display = 'none';
             summaryCards.style.opacity = '1';
             tableBody.style.opacity = '1';
-            
         })
         .catch(err => {
             console.error("Fetch Error:", err);
             tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle mr-2"></i> Gagal memuat data API.</td></tr>`;
-            
-            // Kembalikan opacity
             loader.style.display = 'none';
             summaryCards.style.opacity = '1';
             tableBody.style.opacity = '1';
